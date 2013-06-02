@@ -38,9 +38,9 @@ void serialEvent(Serial myPort) {
       myString = trim(myString);
       int[] sensors = int(split(myString, ','));
       for (int sensorNum = 0; sensorNum < sensors.length; sensorNum++) {
-        print("Sensor " + sensorNum + ": " + sensors[sensorNum] + "\t");
+//        print("Sensor " + sensorNum + ": " + sensors[sensorNum] + "\t");
       }
-      println();
+//      println();
 
       preY1Pos = y1Pos;
       y1Pos = (int)map(sensors[0], 0, 1023, 20, 120);
@@ -70,6 +70,7 @@ void drawGraph () {
   stroke(3, 159, 255, 255);
   line(preX3Pos, preY3Pos, x3Pos, y3Pos);
 
+  //at the edge of the screen, go back to the beginning
   if (x1Pos >= width) {
     refreshTheGraph();
   } else {
@@ -85,13 +86,16 @@ void drawGraph () {
 }
 
 void refreshTheGraph() {
-  saveFrame("Graph-######.png");
+  int y = year();
+  int mo = month();
+  int d = day();
+  int h = hour();  
+  int mi = minute();
+  saveFrame("XYZGraph"+y+"-"+mo+"-"+d+"-"+h+"-"+mi+".png");
   background(0);
   preX1Pos= x1Pos= preX2Pos= x2Pos= preX3Pos= x3Pos= paddingLeft;
   textSize(20);
   text("X", 5, 30);
   text("Y", 5, 170);
   text("Z", 5, 310);
-  fill(255);
 }
-

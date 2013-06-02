@@ -21,5 +21,5 @@ void loop() {
   // after all the sensors have been read, 
   // print a newline and carriage return
   Serial.println();
-  delay(100);
+  delay(200);
 }
