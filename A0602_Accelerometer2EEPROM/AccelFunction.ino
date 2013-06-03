@@ -1,135 +1,3 @@
-/* MMA8452Q Example Code
- by: Jim Lindblom
- SparkFun Electronics
- date: November 17, 2011
- license: Beerware - Use this code however you'd like. If you 
- find it useful you can buy me a beer some time.
- 
- This code should provide example usage for most features of
- the MMA8452Q 3-axis, I2C accelerometer. In the loop function
- the accelerometer interrupt outputs will be polled, and either
- the x/y/z accel data will be output, or single/double-taps,
- portrait/landscape changes will be announced to the serial port.
- Feel free to comment/uncomment out some of the Serial.print 
- lines so you can see the information you're most intereseted in.
- 
- The skeleton is here, feel free to cut/paste what code you need.
- Play around with the settings in initMMA8452Q. Try running the
- code without printing the accel values, to really appreciate
- the single/double-tap and portrait landscape functions. The
- P/L stuff is really neat, something not many accelerometers have.
- 
- Hardware setup:
- MMA8452 Breakout ------------ Arduino
- 3.3V --------------------- 3.3V
- SDA ----------------------- A4
- SCL ----------------------- A5
- INT2 ---------------------- D3
- INT1 ---------------------- D2
- GND ---------------------- GND
- 
- SDA and SCL should have external pull-up resistors (to 3.3V).
- 10k resistors worked for me. They should be on the breakout
- board.
- 
- Note: The MMA8452 is an I2C sensor, however this code does
- not make use of the Arduino Wire library. Because the sensor
- is not 5V tolerant, we can't use the internal pull-ups used
- by the Wire library. Instead use the included i2c.h, defs.h and types.h files.
- */
-#include "i2c.h"  // not the wire library, can't use pull-ups
-
-// The SparkFun breakout board defaults to 1, set to 0 if SA0 jumper on the bottom of the board is set
-#define SA0 1
-#if SA0
-#define MMA8452_ADDRESS 0x1D  // SA0 is high, 0x1C if low
-#else
-#define MMA8452_ADDRESS 0x1C
-#endif
-
-// Set the scale below either 2, 4 or 8
-const byte SCALE = 2;  // Sets full-scale range to +/-2, 4, or 8g. Used to calc real g values.
-// Set the output data rate below. Value should be between 0 and 7
-const byte dataRate = 0;  // 0=800Hz, 1=400, 2=200, 3=100, 4=50, 5=12.5, 6=6.25, 7=1.56
-
-// Pin definitions
-int int1Pin = 2;  // These can be changed, 2 and 3 are the Arduinos ext int pins
-int int2Pin = 3;
-
-int accelCount[3];  // Stores the 12-bit signed value
-float accelG[3];  // Stores the real accel value in g's
-
-void setup()
-{
-  byte c;
-
-  Serial.begin(115200);
-
-  // Set up the interrupt pins, they're set as active high, push-pull
-  pinMode(int1Pin, INPUT);
-  digitalWrite(int1Pin, LOW);
-  pinMode(int2Pin, INPUT);
-  digitalWrite(int2Pin, LOW);
-
-  // Read the WHO_AM_I register, this is a good test of communication
-  c = readRegister(0x0D);  // Read WHO_AM_I register
-  if (c == 0x2A) // WHO_AM_I should always be 0x2A
-  {  
-    initMMA8452(SCALE, dataRate);  // init the accelerometer if communication is OK
-    Serial.println("MMA8452Q is online...");
-  }
-  else
-  {
-    Serial.print("Could not connect to MMA8452Q: 0x");
-    Serial.println(c, HEX);
-    while(1) ; // Loop forever if communication doesn't happen
-  }
-}
-
-void loop()
-{  
-  Serial.println("this is loop()");
-  static byte source;
-
-  // If int1 goes high, all data registers have new data
-  if (digitalRead(int1Pin)==1)  // Interrupt pin, should probably attach to interrupt function
-  {
-    readAccelData(accelCount);  // Read the x/y/z adc values
-
-    /* 
-     //Below we'll print out the ADC values for acceleration
-     for (int i=0; i<3; i++)
-     {
-     Serial.print(accelCount[i]);
-     Serial.print("\t\t");
-     }
-     Serial.println();
-     */
-
-    // Now we'll calculate the accleration value into actual g's
-    for (int i=0; i<3; i++)
-      accelG[i] = (float) accelCount[i]/((1<<12)/(2*SCALE));  // get actual g value, this depends on scale being set
-    // Print out values
-    for (int i=0; i<3; i++)
-    {
-      Serial.print(accelG[i], 4);  // Print g values
-      Serial.print("\t\t");  // tabs in between axes
-    }
-    Serial.println();
-  }
-
-  // If int2 goes high, either p/l has changed or there's been a single/double tap
-  if (digitalRead(int2Pin)==1)
-  {
-    source = readRegister(0x0C);  // Read the interrupt source reg.
-    if ((source & 0x10)==0x10)  // If the p/l bit is set, go check those registers
-      portraitLandscapeHandler();
-    else if ((source & 0x08)==0x08)  // Otherwise, if tap register is set go check that
-      tapHandler();
-  }
-  delay(100);  // Delay here for visibility
-}
-
 void readAccelData(int * destination)
 {
   byte rawData[6];  // x/y/z accel register data stored here
@@ -241,23 +109,12 @@ void initMMA8452(byte fsr, byte dataRate)
     writeRegister(0x2A, readRegister(0x2A) | (dataRate << 3));  
 
   // Set up portrait/landscap registers - 4 steps:
-  // 1. Enable P/L
-  // 2. Set the back/front angle trigger points (z-lock)
-  // 3. Set the threshold/hysteresis angle
-  // 4. Set the debouce rate
-  // For more info check out this app note: http://cache.freescale.com/files/sensors/doc/app_note/AN4068.pdf
   writeRegister(0x11, 0x40);  // 1. Enable P/L
   writeRegister(0x13, 0x44);  // 2. 29deg z-lock (don't think this register is actually writable)
   writeRegister(0x14, 0x84);  // 3. 45deg thresh, 14deg hyst (don't think this register is writable either)
   writeRegister(0x12, 0x50);  // 4. debounce counter at 100ms (at 800 hz)
 
-  /* Set up single and double tap - 5 steps:
-   1. Set up single and/or double tap detection on each axis individually.
-   2. Set the threshold - minimum required acceleration to cause a tap.
-   3. Set the time limit - the maximum time that a tap can be above the threshold
-   4. Set the pulse latency - the minimum required time between one pulse and the next
-   5. Set the second pulse window - maximum allowed time between end of latency and start of second pulse
-   for more info check out this app note: http://cache.freescale.com/files/sensors/doc/app_note/AN4072.pdf */
+  // Set up single and double tap - 5 steps:
   writeRegister(0x21, 0x7F);  // 1. enable single/double taps on all axes
   // writeRegister(0x21, 0x55);  // 1. single taps only on all axes
   // writeRegister(0x21, 0x6A);  // 1. double taps only on all axes

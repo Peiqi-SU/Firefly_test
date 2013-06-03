@@ -10,8 +10,6 @@
 
 #include <Wire.h> //I2C library
 
-
-
 void i2c_eeprom_write_byte( int deviceaddress, unsigned int eeaddress, byte data ) {
   int rdata = data;
   Wire.beginTransmission(deviceaddress);
