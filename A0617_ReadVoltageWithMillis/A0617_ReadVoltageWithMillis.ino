@@ -11,6 +11,6 @@ void loop() {
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillis > interval) {
     previousMillis = currentMillis;
-    Serial.println(analogRead(A0) * (5.0 / 1023.0));
+    Serial.println(analogRead(A0) * (5.0 / 1024.0));
   }
 }

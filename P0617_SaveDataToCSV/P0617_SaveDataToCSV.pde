@@ -25,7 +25,7 @@ void draw() {
 
 
 void serialEvent(Serial myPort) {
-  String inByte = myPort.readStringUntil('\n');
+  String inByte = myPort.readString();
   if (inByte != null) {
     TableRow newRow = table.addRow();
     newRow.setString("Value", inByte);
