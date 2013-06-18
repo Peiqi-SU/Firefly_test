@@ -69,15 +69,19 @@ void portraitLandscapeHandler()
   {
   case 0:
     Serial.print("Portrait up, ");
+    accelValuesInput.accelStatus = 0;
     break;
   case 1:
     Serial.print("Portrait Down, ");
+    accelValuesInput.accelStatus = 4;
     break;
   case 2:
     Serial.print("Landscape Right, ");
+    accelValuesInput.accelStatus = 8;
     break;
   case 3:
     Serial.print("Landscape Left, ");
+    accelValuesInput.accelStatus = 12;
     break;
   }
   if (pl&0x01)  // Check the BAFRO bit

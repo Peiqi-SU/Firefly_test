@@ -82,7 +82,7 @@ void setup()
   // The EEPROM ----------------------------------------------------
   // start reading from position memBase (address 0) of the EEPROM. Set maximumSize to 256kb 
   // Writes before membase or beyond EEPROMSizeUno will only give errors when _EEPROMEX_DEBUG is set
-  EEPROM.setMemPool(memBase, 1024*64-1);  //setMemPool(int base, int memSize); int is 2bytes = 1024*64
+  EEPROM.setMemPool(memBase, 65535);  //setMemPool(int base, int memSize); int is 2bytes = 1024*64
   // Set maximum allowed writes to maxAllowedWrites. 
   // More writes will only give errors when _EEPROMEX_DEBUG is set
   EEPROM.setMaxAllowedWrites(maxAllowedWrites);
@@ -147,30 +147,30 @@ void loop()
   // Read and write different data primitives
   readAndWriteStruct(); 
   // Test error checking
-  errorChecking(address); 
+//  errorChecking(address); 
   // Read and write
   EEPROM.readBlock(address, accelValuesOutput);
   Serial.print(accelValuesOutput.bugID);
-  Serial.print("\t");
+  Serial.print(",");
   Serial.print(accelValuesOutput.runningTime);
-  Serial.print("\t");
+  Serial.print(",");
   Serial.print(accelValuesOutput.thisAddress);
-  Serial.print("\t");
+  Serial.print(",");
   Serial.print(accelValuesOutput.accelX);
-  Serial.print("\t");
+  Serial.print(",");
   Serial.print(accelValuesOutput.accelY);
-  Serial.print("\t");
+  Serial.print(",");
   Serial.print(accelValuesOutput.accelZ);
-  Serial.print("\t");
+  Serial.print(",");
   Serial.print(accelValuesOutput.accelStatus);
-  Serial.print("\t");
+  Serial.print(",");
   Serial.print(accelValuesOutput.examine);
   Serial.println();
   
   // Go to next address 
   address += 23;
   
-  delay(1000);  // Delay here for visibility
+  delay(500);  // Delay here for visibility
 }
 
 

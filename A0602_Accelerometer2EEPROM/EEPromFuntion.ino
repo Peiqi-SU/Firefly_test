@@ -29,7 +29,7 @@ void readAndWriteStruct(){
   accelValuesInput.accelX = accelG[0];
   accelValuesInput.accelY = accelG[1];
   accelValuesInput.accelZ = accelG[2];
-  accelValuesInput.accelStatus = 0;
+//  accelValuesInput.accelStatus = 0;
   accelValuesInput.examine = 0;
   
   EEPROM.writeBlock(address, accelValuesInput);
