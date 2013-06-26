@@ -21,7 +21,7 @@ void draw() {
 void serialEvent(Serial myPort) { 
   try {
     // read the serial buffer
-    String myString = myPort.readStringUntil('\n');
+    String myString = myPort.readString();
     if (counter < 45) {
       if (myString != null) {
         output.println(myString);

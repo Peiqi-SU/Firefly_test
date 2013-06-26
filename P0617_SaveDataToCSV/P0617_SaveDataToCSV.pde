@@ -11,7 +11,7 @@ Table table;
 
 void setup() {  
   println(Serial.list());
-  myPort = new Serial(this, Serial.list()[6], 115200);
+  myPort = new Serial(this, Serial.list()[6], 9600);
   myPort.bufferUntil('\n');
 
   table = new Table();
@@ -25,10 +25,10 @@ void draw() {
 
 
 void serialEvent(Serial myPort) {
-  String inByte = myPort.readString();
+  Float inByte = float(myPort.readString());
   if (inByte != null) {
     TableRow newRow = table.addRow();
-    newRow.setString("Value", inByte);
+    newRow.setFloat("Value", inByte);
     serialCount++;
     // Mark every one second.
     if (serialCount % 100 == 0) {
@@ -37,12 +37,12 @@ void serialEvent(Serial myPort) {
   }
   // Save the table each 30 sec
   if (serialCount % 3000 == 0) {
-    saveTable(table, "data/V22BL.csv");
+    saveTable(table, "data/Capacitor.csv");
   }
 }
 
 
 void keyPressed() {
-  saveTable(table, "data/V22BL.csv");
+  saveTable(table, "data/Capacitor.csv");
 }
 
