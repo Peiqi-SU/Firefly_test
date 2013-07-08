@@ -5,7 +5,7 @@
 // The MMA8452 breakout board defaults to 1, set to 0 if SA0 jumper on the bottom of the board is set
 #define SA0 1
 #if SA0
-#define MMA8452_ADDRESS 0x1D  // SA0 is high, 0x1C if low
+#define MMA8452_ADDRESS 0x50  // SA0 is high, 0x1C if low
 #else
 #define MMA8452_ADDRESS 0x1C
 #endif
