@@ -16,24 +16,27 @@ void setup()
   Serial.begin(9600);
 
   // for debug ----------
-  char somedata[] = "aaaabbcaaaabbc";
+  char somedata[] = "000010231111102322221023000010231111102322221023";
   i2c_eeprom_write_page(0x50, 0, (byte *)somedata, sizeof(somedata));
   delay(100); 
   Serial.println("Memory written");
   // for debug ----------end
+  establishContact();
 }
 
 void loop() {
-  for(int i = 0; i < 100; i++) {
-    char thisBuffer[7];
+  for(int i = 0; i < 3; i++) {
+    char thisBuffer[6];
     i2c_eeprom_read_buffer(0x50, addr, (byte *)thisBuffer, sizeof(thisBuffer));
     Serial.println(thisBuffer);
-    // Get the timastamp and voltage
-    String theData = thisBuffer;
-    thisData.timestamp = (long)theData.substring(0, 3);
-    // Parity
-    
-    addr+=7;
-    delay(5);
+    addr+=6;
+    delay(100);
+  }
+}
+
+void establishContact() {
+  while (Serial.available() <= 0) {
+    Serial.write('A');   // send a capital A
+    delay(100);
   }
 }
