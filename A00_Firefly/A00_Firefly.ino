@@ -31,7 +31,7 @@
 #define DEVICE_ADDRESS 0x50
 #define UNIT_ID 0
 #define NUM 10  // X sets per page
-#define NUM_PAGE 5  // The EEPROM has 512 pages (32k/64)
+#define NUM_PAGE 50  // The EEPROM has 512 pages (32k/64)
 #define PAGE_SIZE 64
 
 int led = 12;
@@ -55,7 +55,7 @@ void setup() {
   // Erase EEPROM
   char erase[PAGE_SIZE];
   for (int i = 0; i < PAGE_SIZE; i++){
-    erase[i] = 0xFF;
+    erase[i] = 0xBB;
   }
   for (int i = 0; i < NUM_PAGE; i++){
     i2c_eeprom_write_page(DEVICE_ADDRESS, EEPageAddress, (byte *)erase, PAGE_SIZE);
@@ -71,15 +71,13 @@ void setup() {
 void loop() {
   for(int i = 0; i < NUM; i++){
     loopCounter++;
-    //    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Will stop internal timer
+        LowPower.powerDown(SLEEP_500MS, ADC_OFF, BOD_OFF); // Will stop internal timer
     thisData.timestamp[i] = millis() + 2500*loopCounter;  // Timestamp
-    Serial.print("time: ");
-    Serial.println(thisData.timestamp[i]);
     thisData.voltage[i] = analogRead(A0);  // Voltage
-
+    
     // Discharge: Light up the LED for __ms
     pinMode(led, OUTPUT);
-    //LowPower.powerDown(SLEEP_500MS, ADC_OFF, BOD_OFF);
+    LowPower.powerDown(SLEEP_500MS, ADC_OFF, BOD_OFF);
     pinMode(led, INPUT);
 
     if(i == NUM-1){
