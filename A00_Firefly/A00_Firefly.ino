@@ -8,6 +8,9 @@
 //#define DATA_MAX_LEN 65536  //MAX of EEPROM
 #define DATA_MAX_LEN 1024
 
+#define UNIQUE_ID 2
+
+
 // Change to 6 to disable the green LED
 unsigned char led = 5; // the blinking green LED coonect to chip
 
@@ -114,6 +117,12 @@ void loop() {
 }
 
 void send_eeprom(){
+  
+  //send id
+  Serial.write('~');
+  send_one_int_value(UNIQUE_ID);
+  
+  
   // invert check
   send_one_int_value_no_newline(data_ptr);
   send_one_int_value(~data_ptr);
