@@ -13,7 +13,7 @@ class Arduino_bug
   int bug_value;
   int serial_cable_position=-1;
 
-  boolean has_vaid_data=false;
+  boolean has_valid_data=false;
   int valid_data_total;
   int valid_data[];
   int valid_bug_id;
@@ -104,6 +104,9 @@ class Arduino_bug
     valid_data_total=accumulator;
     valid_bug_id=bug_id;
     valid_serial_cable_position=serial_cable_position;
+    
+    has_valid_data=true;
+    
     println("Bug "+ valid_bug_id +" on port "+valid_serial_cable_position+" has "+valid_data.length+" values with a sum of "+valid_data_total);
     //TODO: call visualization with  valid_bug_id, valid_serial_cable_position, valid_data.length, valid_data_total
   }
