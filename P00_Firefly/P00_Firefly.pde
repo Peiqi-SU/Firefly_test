@@ -16,10 +16,11 @@ void setup() {
   for (int i=0;i<portlist.length;i++) {
     if (portlist[i].indexOf("tty.usbserial")>=0) {
       println("Assign "+portlist[i]+" to bug "+index);
-      bugs[index] = new Arduino_bug(portlist[i]);
+      bugs[index] = new Arduino_bug(portlist[i],index);
       index++;
       if (index>=bugs.length) break;
-    } else if (portlist[i].indexOf("tty.usbmodem")>=0) {
+    } 
+    else if (portlist[i].indexOf("tty.usbmodem")>=0) {
       led_arduino_port = new Serial(this, portlist[i], 9600);
       led_arduino_port.bufferUntil('\n');
     }
@@ -44,7 +45,8 @@ void draw() {
       if (bugs[i].present) {
         update_bugs(0, 255, 0, i, bugs[i].bug_value, bugs[i].bug_id);
         update_battery(0, 255, 0, i, bugs[i].bug_value, bugs[i].bug_id);
-      } else {
+      } 
+      else {
         update_bugs(100, 100, 100, i, -1, -1);
         update_battery(100, 100, 100, i, -1, -1);
       }
@@ -66,11 +68,10 @@ void serialEvent(Serial sourcePort) {
     // TODO: deal with "inString", data from potencialometer
     knob_value = int(inString.trim());
     light_up_bulb(knob_value);
-    
   }
 }
 
 void mouseClicked() {
-  println(bugs[0].raw_data); // for debugging
+  if (bugs[0]!=null) println(bugs[0].raw_data); // for debugging
 }
 

@@ -11,7 +11,16 @@ class Arduino_bug
   int receive_counter=pages_limit;
   int bug_id=-1;
   int bug_value;
-  Arduino_bug(String _portname) {
+  int serial_cable_position=-1;
+
+  boolean has_vaid_data=false;
+  int valid_data_total;
+  int valid_data[];
+  int valid_bug_id;
+  int valid_serial_cable_position;
+
+  Arduino_bug(String _portname, int pos) {
+    serial_cable_position=pos;
     portname=_portname;
   }
 
@@ -25,7 +34,8 @@ class Arduino_bug
     int time_now = millis();
     if (time_now - last_hearbeat_time < valid_heartbeat_interval) {
       present=true;
-    } else {
+    } 
+    else {
       present=false;
     }
     if (present && !present_last) {  //automatic inquire
@@ -44,25 +54,32 @@ class Arduino_bug
             if ((16*receive_counter+i)<raw_data.length) raw_data[16*receive_counter+i]=unhex(trimmed.substring(i*4, i*4+4));
           }
           receive_counter++;
-          if (receive_counter==pages_limit) port.write(0x18); //erase; 0x18 means cancel signal
+          if (receive_counter==pages_limit) {
+            port.write(0x18); //erase; 0x18 means cancel signal
+            handle_valid_data();
+          }
         }
-      } else if (trimmed.length()==4) { //it's a single value
+      } 
+      else if (trimmed.length()==4) { //it's a single value
         bug_value=unhex(trimmed);
         println("Got value: " + bug_value); // TODO: deal with input value
-      } else if (trimmed.length()==8) {  //it's data length
+      } 
+      else if (trimmed.length()==8) {  //it's data length
         println(trimmed);
         int len=unhex(trimmed.substring(0, 4));
         int len_inv=unhex(trimmed.substring(4, 8));
         if (len+len_inv==0xFFFF) {  // parity
           pages_limit=(len)/16;
           raw_data=new int[pages_limit*16];
-        } else {
+        } 
+        else {
           init_transfer();
           receive_counter=0;
           println("Length error");
         }
-      }else if(trimmed.length()==5 && trimmed.charAt(0)=='~'){
-        int id=unhex(trimmed.substring(1,5));
+      }
+      else if (trimmed.length()==5 && trimmed.charAt(0)=='~') {
+        int id=unhex(trimmed.substring(1, 5));
         bug_id=id;
         println("FROM"+id);
       }
@@ -75,6 +92,20 @@ class Arduino_bug
 
   void init_transfer() {
     port.write(0x07);//bell signal, means '/a'
+  }
+
+  void handle_valid_data() {
+    valid_data=new int[raw_data.length];
+    arrayCopy(raw_data, valid_data);
+    int accumulator = 0;
+    for (int i = 0; i < valid_data.length; i++) {
+      accumulator += valid_data[i];
+    }
+    valid_data_total=accumulator;
+    valid_bug_id=bug_id;
+    valid_serial_cable_position=serial_cable_position;
+    println("Bug "+ valid_bug_id +" on port "+valid_serial_cable_position+" has "+valid_data.length+" values with a sum of "+valid_data_total);
+    //TODO: call visualization with  valid_bug_id, valid_serial_cable_position, valid_data.length, valid_data_total
   }
 }
 
