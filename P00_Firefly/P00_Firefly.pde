@@ -7,7 +7,7 @@ Serial led_arduino_port;
 int knob_value = 0;
 
 void setup() {
-  size(1024, 768);
+  size(1920, 1080);
   background(0);
   basic_interface();
   //mac
