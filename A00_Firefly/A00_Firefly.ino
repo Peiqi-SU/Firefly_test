@@ -60,7 +60,7 @@ void loop() {
       while (Serial.read() != -1);  //clear serial buffer (read until -1)
     }
     send_value_interval_counter++;
-    if (send_value_interval_counter==20){  // only affect the coonecting mode
+    if (send_value_interval_counter==5){  // only affect the coonecting mode
       send_one_int_value(analogRead(0));  //send a value every n*100 ms
       send_value_interval_counter=0;
     }
@@ -108,7 +108,7 @@ void loop() {
       }
     }
     last_loop_plugged = false;
-    //LowPower.powerDown(SLEEP_120MS, ADC_OFF, BOD_OFF); //debuging
+    //LowPower.powerDown(SLEEP_120MS, ADC_OFF, BOD_OFF); //debugging
     LowPower.powerDown(SLEEP_2S, ADC_OFF, BOD_OFF); 
   }
 

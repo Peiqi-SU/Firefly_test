@@ -1,48 +1,70 @@
-#include <Wire.h>
+unsigned long previousMillis = 0; 
+String inputString = "";         // a string to hold incoming data
+String dealString = "";         // a string to hold incoming data
 
-#define UNIT_ID 0
-#define PAGE_SIZE 64
-
-int addr = 0;
-int counter = 0;
-struct Data {
-  unsigned long timestamp;
-  unsigned int voltage;
-  unsigned char parity;
-};
-Data thisData;
-char thisBuffer[PAGE_SIZE]; // for debug
+boolean stringComplete = false;  // whether the string is complete
 
 
-void setup() 
-{
-  Wire.begin(); 
-  Serial.begin(9600);
-
-  // for debug ----------
-  char somedata[] = "hello world";
-  i2c_eeprom_write_page(0x50, 0, (byte *)somedata, sizeof(somedata));
-  delay(100); 
-  Serial.println("Memory written");
-  // for debug ----------end
-  //establishContact();  // comment for debug
+void setup() {
+  // initialize serial communications at 9600 bps:
+  Serial.begin(9600); 
+  inputString.reserve(64);
+  dealString.reserve(64);
+  pinMode(9,OUTPUT);
+  pinMode(10,OUTPUT);
+  pinMode(11,OUTPUT);
 }
 
 void loop() {
-  //    char thisBuffer[PAGE_SIZE]; // comment for debug
+  // read the analog in value:
 
-  byte b = i2c_eeprom_read_byte(0x50, addr);
-  Serial.print((char)b); //print content to serial port
-  addr++; //increase address
-  delay(100);
-}
-
-void establishContact() {
-  while (Serial.available() <= 0) {
-    Serial.write('A');   // send a capital A
-    delay(100);
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillis > 50) { // send value to processing every 50ms
+    unsigned int sensorValue = analogRead(0);            
+    Serial.println(sensorValue);      
+    previousMillis=currentMillis;
+  }
+  if (stringComplete) {
+    dealString=inputString;
+    inputString = "";
+    stringComplete = false;
+    dealString.trim();
+    unsigned char r,g,b;
+    unsigned char comma_index=dealString.indexOf(',');
+    if (comma_index>0){
+      r=dealString.substring(0,comma_index).toInt();
+      unsigned char comma_index2=dealString.indexOf(',',comma_index+1);
+      if (comma_index2>0){
+        g=dealString.substring(comma_index+1,comma_index2).toInt();
+        b=dealString.substring(comma_index2+1,dealString.length()).toInt();
+        analogWrite(9,r);
+        analogWrite(10,g);
+        analogWrite(11,b);
+      }
+      /* for debugging
+       Serial.println(r);
+       Serial.println(g);
+       Serial.println(b);*/
+    }
   }
 }
+
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read(); 
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == '\n') {
+      stringComplete = true;
+    } 
+  }
+}
+
+
+
 
 
 
