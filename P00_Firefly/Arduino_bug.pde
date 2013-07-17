@@ -104,11 +104,29 @@ class Arduino_bug
     valid_data_total=accumulator;
     valid_bug_id=bug_id;
     valid_serial_cable_position=serial_cable_position;
-    
+
     has_valid_data=true;
-    
+
     println("Bug "+ valid_bug_id +" on port "+valid_serial_cable_position+" has "+valid_data.length+" values with a sum of "+valid_data_total);
     //TODO: call visualization with  valid_bug_id, valid_serial_cable_position, valid_data.length, valid_data_total
+  }
+
+  void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
+    int max_pos=10;  //change this according your value
+    stroke(255);
+    strokeWeight(1);
+    //line(pos_x, pos_y, pos_x+graph_width, pos_y+graph_height);
+    float y0=map(valid_data[0], -0, max_pos, pos_y+graph_height, pos_y);
+    float x0=0;
+    for (int i=0;i<valid_data.length-1;i++) {
+      float y1=map(valid_data[i+1], -0, max_pos, pos_y+graph_height, pos_y);
+      float x1=pos_x+(i+1)*graph_width/(valid_data.length-1);
+      line (x0, y0, x1, y1);
+      //println(x0+" "+y0+" "+x1+ " "+y1);
+      y0=y1;
+      x0=x1;
+    }
+    //println("~~~~");
   }
 }
 

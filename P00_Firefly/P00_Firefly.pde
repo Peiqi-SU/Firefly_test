@@ -7,7 +7,8 @@ Serial led_arduino_port;
 int knob_value = 0;
 
 void setup() {
-  size(1920, 1080);
+  size(1024, 768);  //I can't test on FULL HD
+  //size(1920, 1080);
   background(0);
   basic_interface();
   //mac
@@ -16,7 +17,7 @@ void setup() {
   for (int i=0;i<portlist.length;i++) {
     if (portlist[i].indexOf("tty.usbserial")>=0) {
       println("Assign "+portlist[i]+" to bug "+index);
-      bugs[index] = new Arduino_bug(portlist[i],index);
+      bugs[index] = new Arduino_bug(portlist[i], index);
       index++;
       if (index>=bugs.length) break;
     } 
@@ -30,8 +31,13 @@ void setup() {
    bugs[0] = new Arduino_bug("COM44");
    bugs[1] = new Arduino_bug("COM31");*/
 
+
+
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].init(this);
+
+  //fake a bug
+  bugs[0] = new Arduino_bug("COM44", 0);
 }
 
 void draw() {
@@ -52,6 +58,14 @@ void draw() {
       }
     }
   }
+
+  for (int i=0;i<bugs.length;i++) {
+    if (bugs[i]!=null &&  bugs[i].has_valid_data) { //you can also add present condition
+      bugs[i].draw_graph(0, 0, 100, 100);
+    }
+  }
+
+
   update_timer(knob_value);
 }
 
@@ -72,6 +86,17 @@ void serialEvent(Serial sourcePort) {
 }
 
 void mouseClicked() {
-  if (bugs[0]!=null) println(bugs[0].raw_data); // for debugging
+  //if (bugs[0]!=null) println(bugs[0].raw_data); // for debugging
+  //fake some data;
+  bugs[0].valid_data=new int[120];
+  int accumulator = 0;
+  for (int i = 0; i < bugs[0].valid_data.length; i++) {
+    bugs[0].valid_data[i]=int(2.5+2.5*sin(i*TWO_PI/20));
+    accumulator += bugs[0].valid_data[i];
+  }
+  bugs[0].valid_data_total=accumulator;
+  bugs[0].valid_bug_id=3;
+  bugs[0].valid_serial_cable_position=bugs[0].serial_cable_position;
+  bugs[0].has_valid_data=true;
 }
 
