@@ -1,4 +1,4 @@
-void basic_interface() {
+void basic_interface(){
   stroke(150);
   strokeWeight(2);
   fill(100);

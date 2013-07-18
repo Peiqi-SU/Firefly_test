@@ -1,72 +1,84 @@
 import processing.serial.*;
-
-Arduino_bug bugs[]=new Arduino_bug[2]; // init num of bugs
-
 Serial led_arduino_port;
 
+Firefly_Bug bugs[];
+Firefly_UI ui;
+Firefly_Bulb bulb;
+
 int knob_value = 0;
+int BUG_NUMBERS = 6;  // init num of bugs
 
 void setup() {
   size(1024, 768);  //I can't test on FULL HD
   //size(1920, 1080);
   background(0);
-  basic_interface();
-  //mac
-  String portlist[]=Serial.list();
-  int index=0;
-  for (int i=0;i<portlist.length;i++) {
-    if (portlist[i].indexOf("tty.usbserial")>=0) {
-      println("Assign "+portlist[i]+" to bug "+index);
-      bugs[index] = new Arduino_bug(portlist[i], index);
-      index++;
-      if (index>=bugs.length) break;
-    } 
-    else if (portlist[i].indexOf("tty.usbmodem")>=0) {
-      led_arduino_port = new Serial(this, portlist[i], 9600);
-      led_arduino_port.bufferUntil('\n');
-    }
-  }
-
-  /*  //windows
+  bugs =new Firefly_Bug[BUG_NUMBERS];
+  ui = new Firefly_UI();
+  bulb = new Firefly_Bulb();
+  
+  
+  //mac--------------------------------------
+//  String portlist[]=Serial.list();
+//  int index=0;
+//  for (int i=0;i<portlist.length;i++) {
+//    if (portlist[i].indexOf("tty.usbserial")>=0) {
+//      println("Assign "+portlist[i]+" to bug "+index);
+//      bugs[index] = new Firefly_Bug(portlist[i], index);
+//      index++;
+//      if (index>=bugs.length) break;
+//    } else if (portlist[i].indexOf("tty.usbmodem")>=0) {
+//      led_arduino_port = new Serial(this, portlist[i], 9600);
+//      led_arduino_port.bufferUntil('\n');
+//    }
+//  }
+  //--------------------------------------
+  /*  //windows--------------------------------------
    bugs[0] = new Arduino_bug("COM44");
-   bugs[1] = new Arduino_bug("COM31");*/
-
-
+   bugs[1] = new Arduino_bug("COM31");
+   //--------------------------------------*/
 
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].init(this);
 
-  //fake a bug
-  bugs[0] = new Arduino_bug("COM44", 0);
+  //fake a bug on windows
+  //  bugs[0] = new Arduino_bug("COM44", 0);
+  
+  //fake 6 bugs on mac
+  for (int i = 0;i < 6; i++){
+   bugs[i] = new Firefly_Bug("/dev/tty.usbserial"+i, i);
+  }
 }
 
 void draw() {
   background(0);
-  basic_interface();
+  ui.basic_interface();
+  
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].update();
-
+    
   for (int i=0;i<bugs.length;i++) {
     if (bugs[i]!=null) {
-      if (bugs[i].present) {
-        update_bugs(0, 255, 0, i, bugs[i].bug_value, bugs[i].bug_id);
-        update_battery(0, 255, 0, i, bugs[i].bug_value, bugs[i].bug_id);
-      } 
-      else {
-        update_bugs(100, 100, 100, i, -1, -1);
-        update_battery(100, 100, 100, i, -1, -1);
-      }
+      // if bug is online, draw the name of bug, value 
+//      if (bugs[i].present) {
+//        println(bugs.length);
+
+        ui.update_bugs(0, 255, 0, i, bugs[i].bug_value,bugs[i].bug_id);
+//        ui.update_battery(0, 255, 0, i, bugs[i].bug_value, bugs[i].bug_id);
+//      } else {
+//        // if bug is offline, draw a gray spot
+//        ui.update_bugs(100, 100, 100, i, -1, -1);
+//        ui.update_battery(100, 100, 100, i, -1, -1);
+//      }
     }
   }
-
+// draw the line graph
   for (int i=0;i<bugs.length;i++) {
     if (bugs[i]!=null &&  bugs[i].has_valid_data) { //you can also add present condition
-      bugs[i].draw_graph(0, 0, 100, 100);
+      bugs[i].draw_graph((width/8)*(i+1), height-100, 100, 100);
     }
   }
-
-
-  update_timer(knob_value);
+  
+  ui.update_timer(knob_value);
 }
 
 void serialEvent(Serial sourcePort) {
@@ -81,7 +93,7 @@ void serialEvent(Serial sourcePort) {
     //   println("FROM led ARDUINO: " + inString.trim()); 
     // TODO: deal with "inString", data from potencialometer
     knob_value = int(inString.trim());
-    light_up_bulb(knob_value);
+    bulb.light_up_bulb(knob_value);
   }
 }
 
