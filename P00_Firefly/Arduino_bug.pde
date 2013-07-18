@@ -87,26 +87,12 @@ class Arduino_bug
         int id=unhex(trimmed.substring(1, 5));
         bug_id=id;
         // assign kid's name to each bug
-        switch(bug_id) {
-        case 1: 
-          bug_name = blue_1; 
-          break;
-        case 2: 
-          bug_name = blue_2;
-          break;
-        case 3: 
-          bug_name = red_1;
-          break;
-        case 4: 
-          bug_name = red_2;
-          break;
-        case 5: 
-          bug_name = green_1;
-          break;
-        case 6: 
-          bug_name = green_2;
-          break;
-        }
+        if (bug_id == 1) bug_name = blue_1;
+        if (bug_id == 2) bug_name = blue_2;
+        if (bug_id == 3) bug_name = red_1;
+        if (bug_id == 4) bug_name = red_2;
+        if (bug_id == 5) bug_name = green_1;
+        if (bug_id == 6) bug_name = green_2;
         //        println("FROM"+id);
       }
       else {
