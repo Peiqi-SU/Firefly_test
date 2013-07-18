@@ -7,7 +7,7 @@
 //#define DATA_MAX_LEN 65536  //MAX of EEPROM
 #define DATA_MAX_LEN 1024
 
-#define UNIQUE_ID 4
+#define UNIQUE_ID 3
 
 
 // Change to 6 to disable the green LED

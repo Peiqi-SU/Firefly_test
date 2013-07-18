@@ -47,6 +47,7 @@ void setup() {
 }
 
 void draw() {
+  //  println("sum_value: "+bugs[2].sum_value); // for dubugging
   background(0);
   basic_interface();
   for (int i=0;i<bugs.length;i++)
@@ -56,13 +57,28 @@ void draw() {
     if (bugs[i]!=null) {
       // if bug is online
       if (bugs[i].present) {
-        update_bugs(i, bugs[i].sum_value, bugs[i].bug_id);
-        update_battery(0, 255, 0, i, bugs[i].sum_value, bugs[i].bug_id);
+        // total height
+        float total = 0;
+        float previous_height = bugs[i].energy_height;
+        float energy_height_y = 0;
+        for (int j=0;j<bugs.length;j++) {
+          if (bugs[j]!=null) total += energy_height_display(bugs[j].sum_value);
+        }
+        // don't exceed the battery height
+        if (total<height/2.5) bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
+        else bugs[i].energy_height = previous_height;
+        // energy_height_y
+        for (int j = 0; j<=i; j++) {
+          if (bugs[j]!=null) energy_height_y += energy_height_display(bugs[j].sum_value);
+        }
+        update_line_from_bug(i, bugs[i].bug_id);
+        update_bugs(i, bugs[i].sum_value, bugs[i].bug_id, bugs[i].bug_name);
+        update_battery(i, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
       } 
       // if bug is offline
       else {
-        update_bugs( i, -1, -1);
-        update_battery(100, 100, 100, i, -1, -1);
+        update_bugs( i, -1, -1, "");
+        update_battery(i, -1, -1, -1, "");
       }
     }
   }

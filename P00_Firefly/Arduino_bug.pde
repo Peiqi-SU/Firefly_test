@@ -15,17 +15,17 @@ class Arduino_bug
   int serial_cable_position=-1;
 
   boolean has_valid_data=false;
-  int valid_data_total;
-  int valid_data[];
+  float valid_data_total;// sum energy, not voltage
+  float valid_data[];
   int valid_bug_id;
   int valid_serial_cable_position;
 
-  int sum_value = 0;
+  float sum_value = 0; // sum energy, not voltage
+  float energy_height = 0; // the height of the energy
 
-  Arduino_bug(String _portname, int pos, String name) {
+  Arduino_bug(String _portname, int pos) {
     serial_cable_position=pos;
     portname=_portname;
-    bug_name = name;
   }
 
   void init(PApplet main_applet) {
@@ -87,8 +87,26 @@ class Arduino_bug
         int id=unhex(trimmed.substring(1, 5));
         bug_id=id;
         // assign kid's name to each bug
-        if (id == 1) bug_name = blue_1;
-blue_1
+        switch(bug_id) {
+        case 1: 
+          bug_name = blue_1; 
+          break;
+        case 2: 
+          bug_name = blue_2;
+          break;
+        case 3: 
+          bug_name = red_1;
+          break;
+        case 4: 
+          bug_name = red_2;
+          break;
+        case 5: 
+          bug_name = green_1;
+          break;
+        case 6: 
+          bug_name = green_2;
+          break;
+        }
         //        println("FROM"+id);
       }
       else {
@@ -103,14 +121,15 @@ blue_1
   }
 
   void handle_valid_data() {
-    valid_data=new int[raw_data.length];
+    valid_data=new float[raw_data.length];
     arrayCopy(raw_data, valid_data);
     int accumulator = 0;
     for (int i = 0; i < valid_data.length; i++) {
-      accumulator += valid_data[i];
+      if (valid_data[i]!=0) accumulator += bug_energy(valid_data[i]);
     }
     valid_data_total=accumulator;
     valid_bug_id=bug_id;
+
     valid_serial_cable_position=serial_cable_position;
 
     has_valid_data=true;
@@ -124,7 +143,7 @@ blue_1
 
   void handle_single_data(int value) {
     // add the data to sum value
-    sum_value += value;
+    if (value != 0) sum_value += bug_energy(value);
   }
 
   void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
