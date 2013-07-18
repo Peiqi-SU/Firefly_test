@@ -1,4 +1,4 @@
-class Firefly_Bug 
+class Arduino_bug 
 {
   String portname="";
   Serial port;
@@ -10,6 +10,7 @@ class Firefly_Bug
   int pages_limit=2;
   int receive_counter=pages_limit;
   int bug_id=-1;
+  String bug_name;
   int bug_value;
   int serial_cable_position=-1;
 
@@ -19,9 +20,12 @@ class Firefly_Bug
   int valid_bug_id;
   int valid_serial_cable_position;
 
-  Firefly_Bug(String _portname, int pos) {
+  int sum_value = 0;
+
+  Arduino_bug(String _portname, int pos, String name) {
     serial_cable_position=pos;
     portname=_portname;
+    bug_name = name;
   }
 
   void init(PApplet main_applet) {
@@ -49,7 +53,7 @@ class Firefly_Bug
     if (trimmed.length()>0) {
       if (trimmed.length()==16*4) {  //it's a page data
         if (receive_counter<pages_limit) {
-          println(trimmed); // for debuging
+          //          println(trimmed); // for debuging
           for (int i=0;i<16;i++) {
             if ((16*receive_counter+i)<raw_data.length) raw_data[16*receive_counter+i]=unhex(trimmed.substring(i*4, i*4+4));
           }
@@ -62,10 +66,11 @@ class Firefly_Bug
       } 
       else if (trimmed.length()==4) { //it's a single value
         bug_value=unhex(trimmed);
-        println("Got value: " + bug_value); // TODO: deal with input value
+        handle_single_data(bug_value);
+        //        println("Got value: " + bug_value); // TODO: deal with input value
       } 
       else if (trimmed.length()==8) {  //it's data length
-        println(trimmed);
+        //        println(trimmed);
         int len=unhex(trimmed.substring(0, 4));
         int len_inv=unhex(trimmed.substring(4, 8));
         if (len+len_inv==0xFFFF) {  // parity
@@ -81,7 +86,10 @@ class Firefly_Bug
       else if (trimmed.length()==5 && trimmed.charAt(0)=='~') {
         int id=unhex(trimmed.substring(1, 5));
         bug_id=id;
-        println("FROM"+id);
+        // assign kid's name to each bug
+        if (id == 1) bug_name = blue_1;
+blue_1
+        //        println("FROM"+id);
       }
       else {
         println("! unexpected:"+trimmed);
@@ -107,9 +115,18 @@ class Firefly_Bug
 
     has_valid_data=true;
 
+    // add the data to sum value
+    sum_value += valid_data_total;
+
     println("Bug "+ valid_bug_id +" on port "+valid_serial_cable_position+" has "+valid_data.length+" values with a sum of "+valid_data_total);
     //TODO: call visualization with  valid_bug_id, valid_serial_cable_position, valid_data.length, valid_data_total
   }
+
+  void handle_single_data(int value) {
+    // add the data to sum value
+    sum_value += value;
+  }
+
   void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
     int max_pos=10;  //change this according your value
     stroke(255);
@@ -126,6 +143,6 @@ class Firefly_Bug
       x0=x1;
     }
     //println("~~~~");
-  }  
+  }
 }
 
