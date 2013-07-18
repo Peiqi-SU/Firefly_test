@@ -1,6 +1,6 @@
 import processing.serial.*;
 
-Arduino_bug bugs[]=new Arduino_bug[2]; // init num of bugs
+Arduino_bug bugs[]=new Arduino_bug[6]; // init num of bugs
 
 Serial led_arduino_port;
 
@@ -12,32 +12,37 @@ void setup() {
   background(0);
   basic_interface();
   //mac
-  String portlist[]=Serial.list();
-  int index=0;
-  for (int i=0;i<portlist.length;i++) {
-    if (portlist[i].indexOf("tty.usbserial")>=0) {
-      println("Assign "+portlist[i]+" to bug "+index);
-      bugs[index] = new Arduino_bug(portlist[i], index);
-      index++;
-      if (index>=bugs.length) break;
-    } 
-    else if (portlist[i].indexOf("tty.usbmodem")>=0) {
-      led_arduino_port = new Serial(this, portlist[i], 9600);
-      led_arduino_port.bufferUntil('\n');
-    }
-  }
+  /* String portlist[]=Serial.list();
+   int index=0;
+   for (int i=0;i<portlist.length;i++) {
+   if (portlist[i].indexOf("tty.usbserial")>=0) {
+   println("Assign "+portlist[i]+" to bug "+index);
+   bugs[index] = new Arduino_bug(portlist[i], index);
+   index++;
+   if (index>=bugs.length) break;
+   } 
+   else if (portlist[i].indexOf("tty.usbmodem")>=0) {
+   led_arduino_port = new Serial(this, portlist[i], 9600);
+   led_arduino_port.bufferUntil('\n');
+   }
+   }*/
 
-  /*  //windows
-   bugs[0] = new Arduino_bug("COM44");
-   bugs[1] = new Arduino_bug("COM31");*/
+  //windows
+  bugs[0] = new Arduino_bug("COM?",0);
+  bugs[1] = new Arduino_bug("COM?",1);
+  bugs[2] = new Arduino_bug("COM?",2);
+  bugs[3] = new Arduino_bug("COM?",3);
+  bugs[4] = new Arduino_bug("COM?",4);
+  bugs[5] = new Arduino_bug("COM?",5);
 
-
+  led_arduino_port = new Serial(this, "COM?", 9600);
+  led_arduino_port.bufferUntil('\n');
 
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].init(this);
 
   //fake a bug
-  bugs[0] = new Arduino_bug("COM44", 0);
+  //bugs[0] = new Arduino_bug("COM44", 0);
 }
 
 void draw() {
@@ -88,7 +93,7 @@ void serialEvent(Serial sourcePort) {
 void mouseClicked() {
   //if (bugs[0]!=null) println(bugs[0].raw_data); // for debugging
   //fake some data;
-  bugs[0].valid_data=new int[120];
+  /*bugs[0].valid_data=new int[120];
   int accumulator = 0;
   for (int i = 0; i < bugs[0].valid_data.length; i++) {
     bugs[0].valid_data[i]=int(2.5+2.5*sin(i*TWO_PI/20));
@@ -97,6 +102,6 @@ void mouseClicked() {
   bugs[0].valid_data_total=accumulator;
   bugs[0].valid_bug_id=3;
   bugs[0].valid_serial_cable_position=bugs[0].serial_cable_position;
-  bugs[0].has_valid_data=true;
+  bugs[0].has_valid_data=true;*/
 }
 
