@@ -7,7 +7,8 @@ float [ ] dashes_battery = { 10, 30 };
 
 void basic_interface() {
   draw_battery_border();
-  if(knob_value < 1023 && bugs[4].sum_value >0 )update_line_from_battery(true); // bugs[4].sum_value should be replaced by total_time
+  println("total time : "+  total_time +", knob value : " +knob_value);
+  if(knob_value < 1023 && total_time >0 )update_line_from_battery(true); // bugs[4].sum_value should be replaced by total_time
   else update_line_from_battery(false);
 }
 
