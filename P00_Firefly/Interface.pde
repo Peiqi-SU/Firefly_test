@@ -24,7 +24,7 @@ void update_bugs(int i, float value, int id, String name) {
   else if (id == -1) fill(100, 100, 100);
   else println("wrong bug ID in - [update_bugs]:"+id);
 
-  int x = int((width/8)*(i+1.5));
+  int x = int((width/(total_bugs+2))*(i+1.5));
   int y = height-height/14;
   rectMode(CENTER); 
   rect(x, y, width/10, height/7, width/100);
@@ -61,7 +61,7 @@ void update_battery(int i, float energy_height, float energy_height_y, int id, S
 }
 
 void update_line_from_bug(int i, int id, int bug_value) {
-  int x = int((width/8)*(i+1.5));
+  int x = int((width/(total_bugs+2))*(i+1.5));
   int y = height-height/7;
   int line_color = 0;
   if (bug_value >0) {
@@ -76,7 +76,7 @@ void update_line_from_bug(int i, int id, int bug_value) {
   }
   else {
    stroke(#CCCCCC);
-    strokeWeight(4);
+    strokeWeight(10);
     draw_dashline(x, y, width/2, height/2.3+height/5, dashes_bug, #CCCCCC, false);
   }
 }
