@@ -1,5 +1,4 @@
 #include <Wire.h>
-//#include <EEPROM.h>
 #include "LowPower.h"
 
 #define SAMPLE_PIN A0 // measure the capacitor connected to piezo
@@ -8,7 +7,7 @@
 //#define DATA_MAX_LEN 65536  //MAX of EEPROM
 #define DATA_MAX_LEN 1024
 
-#define UNIQUE_ID 2
+#define UNIQUE_ID 3
 
 
 // Change to 6 to disable the green LED

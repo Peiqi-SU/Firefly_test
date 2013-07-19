@@ -37,9 +37,9 @@ void loop() {
       if (comma_index2>0){
         g=dealString.substring(comma_index+1,comma_index2).toInt();
         b=dealString.substring(comma_index2+1,dealString.length()).toInt();
-        analogWrite(9,r);
-        analogWrite(10,g);
-        analogWrite(11,b);
+        analogWrite(9,b); //b
+        analogWrite(10,r);  //r
+        analogWrite(11,g); // g
       }
       /* for debugging
        Serial.println(r);
