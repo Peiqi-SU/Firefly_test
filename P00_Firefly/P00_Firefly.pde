@@ -8,12 +8,12 @@ int knob_value = 0;
 float total_time = 0;
 
 void setup() {
-  //size(1024, 768);  //I can't test on FULL HD
+  size(1024, 768);  //I can't test on FULL HD
   //size(1920, 1080);
 
   // set fullscreen mode
-  size(displayWidth, displayHeight);
-  frame.setLocation(0, 0);
+  //size(displayWidth, displayHeight);
+  //frame.setLocation(0, 0);
 
   background(0);
   frameRate(30);
@@ -66,7 +66,7 @@ void draw() {
   for (int i=0;i<bugs.length;i++) {
     if (bugs[i]!=null) {
       // if bug is online
-      if (bugs[i].present) {
+      if (bugs[i].present && bugs[i].sum_value > 0) {
         // total height
         float total = 0;
         float previous_height = bugs[i].energy_height;
@@ -80,7 +80,7 @@ void draw() {
           bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
         }
         else bugs[i].energy_height = previous_height;
-        // energy_height_y
+        // energy_height_y (including self height)
         for (int j = 0; j<=i; j++) {
           if (bugs[j]!=null && total<height/2.5) energy_height_y += 100*energy_height_display(bugs[j].sum_value);
         }
