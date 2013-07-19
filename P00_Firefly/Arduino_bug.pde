@@ -121,7 +121,7 @@ class Arduino_bug
     has_valid_data=true;
 
     // add the data to sum value
-    sum_value += valid_data_total*1000000; // for testing '*1000000'
+    sum_value += valid_data_total*1000000;
 
     println("Bug "+ valid_bug_id +" on port "+valid_serial_cable_position+" has "+valid_data.length+" values with a sum of "+valid_data_total);
     //TODO: call visualization with  valid_bug_id, valid_serial_cable_position, valid_data.length, valid_data_total

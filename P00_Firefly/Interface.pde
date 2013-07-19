@@ -1,19 +1,14 @@
 final int SMALL = 18; //small size of font
 final int BIG = 30; //BIG size of font
 final int HUGE = 80; //huge size of font
-// battery_height = height/2.5;
-// battery_width = width/4;
 
-float [ ] dashes_bug = { 
-  10, 20
-};
-float [ ] dashes_battery = { 
-  10, 30
-};
+float [ ] dashes_bug = { 10, 20 };
+float [ ] dashes_battery = { 10, 30 };
 
 void basic_interface() {
   draw_battery_border();
-  if (knob_value < 1023 && bugs[4].sum_value >0 )update_line_from_battery(true); // bugs[4].sum_value should be replaced by total_time
+  println("total time : "+  total_time +", knob value : " +knob_value);
+  if(knob_value < 1023 && total_time >0 )update_line_from_battery(true); // bugs[4].sum_value should be replaced by total_time
   else update_line_from_battery(false);
 }
 
@@ -35,70 +30,70 @@ void update_bugs(int i, float value, int id, String name) {
   if (id>-1) text(name, x-width/30, y-height/25);
   // Time
   textSize(BIG);
-  if (value>-1) text(value, x-width/25, y+height/100); //for testing --chan (value '*100')
+  if (value>-1) text(value*100, x-width/25, y+height/100); //for testing --chan (value '*100')
 }
 
 void update_battery(int i, float energy_height, float energy_height_y, int id, String name) {
   if (id>-1) {
     energy_height = energy_height*100;// for testing --chan (energy_height '*100')
     float strokeoffset = 4;
-
+    
     if (id == 1 || id == 2) fill(10, 10, 255);
     else if (id == 3 || id == 4) fill(255, 10, 10);
     else if (id == 5 || id == 6) fill(10, 255, 10);
     else if (id == -1) noFill();
     else println("wrong bug ID in - [update_bugs]:"+id);
     stroke(187);
-    strokeWeight(2);
+    strokeWeight(0);
     rectMode(CORNER);
+    
     float x = width/2-width/6/2 +strokeoffset;
     float y = height/2.3+height/5-energy_height_y;
-    rect(x, y-energy_height-strokeoffset, width/6-strokeoffset*2, energy_height);
+    rect(x, y-energy_height-strokeoffset,width/6-strokeoffset*2, energy_height);
     fill(255);
     textSize(SMALL);
     text(name, x, y-strokeoffset);
   }
-  //  draw_battery_border();
 }
 
 void update_line_from_bug(int i, int id) {
   int x = int((width/8)*(i+1.5));
-  nt y = height-height/7;
+  int y = height-height/7;
   int line_color = 0;
   if (id == 1 || id == 2) line_color = #0A0AFF;//stroke(10, 10, 255); 
   else if (id == 3 || id == 4) line_color = #FF0A0A;//stroke(255, 10, 10);
   else if (id == 5 || id == 6) line_color= #0AFF0A;//stroke(10, 255, 10);
   stroke(line_color);
   strokeWeight(10);
-  //  rect(width/2, height/2.3, width/6, height/2.5, width/100);
+//  rect(width/2, height/2.3, width/6, height/2.5, width/100);
   // (x-start,y-start,x-end,y-end,dash-style,color,animate?)
-  draw_dashline(x, y, width/2, height/2.3+height/5, dashes_bug, line_color, true);
+  draw_dashline(x, y, width/2, height/2.3+height/5,dashes_bug,line_color,true);
 }
 
-void update_line_from_battery(boolean animate) {
+void update_line_from_battery(boolean animate){
   int line_color = 0;
   strokeWeight(18);
-  if (animate)line_color = #FFFF0D;
+  if(animate)line_color = #FFFF0D;
   else line_color = #CCCCCC; 
-  draw_dashline(width/2, 0, width/2, height/2.3-height/4, dashes_battery, line_color, animate);
+  draw_dashline(width/2,0,width/2,height/2.3-height/4,dashes_battery,line_color,animate);
 }
 
 void draw_battery_border() {
   stroke(187);
   strokeWeight(10);
-  noFill();
+  fill(10);
   rectMode(CENTER);
   //cap
   //  rect(500, 300, 70, 307, 7);
-  //  rect(width/2, height/2.3-height/20, width/12, height/2.5, width/100);
+//  rect(width/2, height/2.3-height/20, width/12, height/2.5, width/100);
   rect(width/2, height/2.3-height/20, width/18, height/2.5, width/100);
   //body
   //  rect(500, 333, 200, 307, 7);
-  //  rect(width/2, height/2.3, width/4, height/2.5, width/100);
+//  rect(width/2, height/2.3, width/4, height/2.5, width/100);
   rect(width/2, height/2.3, width/6, height/2.5, width/100);
 }
 
-void update_timer(int value) {
+void update_timer(float value) {
   noStroke();
   fill(255, 205,0);
   textSize(HUGE);
@@ -174,3 +169,4 @@ void draw_dashline(float x0, float y0, float x1, float y1, float[ ] spacing, int
     }
   }
 }
+

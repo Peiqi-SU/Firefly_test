@@ -5,6 +5,7 @@ Arduino_bug bugs[]=new Arduino_bug[6]; // init num of bugs
 Serial led_arduino_port;
 
 int knob_value = 0;
+float total_time = 0;
 
 void setup() {
   //size(1024, 768);  //I can't test on FULL HD
@@ -16,35 +17,33 @@ void setup() {
 
   background(0);
   frameRate(30);
-
-  //mac
-  String portlist[]=Serial.list();
-  int index=0;
-  for (int i=0;i<portlist.length;i++) {
-    if (portlist[i].indexOf("tty.usbserial")>=0) {
-      println("Assign "+portlist[i]+" to bug "+index);
-      bugs[index] = new Arduino_bug(portlist[i], index);
-      index++;
-      if (index>=bugs.length) break;
-    } 
-    else if (portlist[i].indexOf("tty.usbmodem")>=0) {
-      led_arduino_port = new Serial(this, portlist[i], 9600);
-      led_arduino_port.bufferUntil('\n');
-    }
-  }
-
-  /*
-  //windows
-   bugs[0] = new Arduino_bug("COM4",0);
-   bugs[1] = new Arduino_bug("COM5",1);
-   bugs[2] = new Arduino_bug("COM6",2);
-   bugs[3] = new Arduino_bug("COM8",3);
-   bugs[4] = new Arduino_bug("COM9",4);
-   bugs[5] = new Arduino_bug("COM10",5);
-   
-   led_arduino_port = new Serial(this, "COM7", 9600);
+  /*//mac
+   String portlist[]=Serial.list();
+   int index=0;
+   for (int i=0;i<portlist.length;i++) {
+   if (portlist[i].indexOf("tty.usbserial")>=0) {
+   println("Assign "+portlist[i]+" to bug "+index);
+   bugs[index] = new Arduino_bug(portlist[i], index);
+   index++;
+   if (index>=bugs.length) break;
+   } 
+   else if (portlist[i].indexOf("tty.usbmodem")>=0) {
+   led_arduino_port = new Serial(this, portlist[i], 9600);
    led_arduino_port.bufferUntil('\n');
-   */
+   }
+   }*/
+
+
+  //windows`
+  bugs[0] = new Arduino_bug("COM13", 0);
+  bugs[1] = new Arduino_bug("COM5", 1);
+  bugs[2] = new Arduino_bug("COM6", 2);
+  bugs[3] = new Arduino_bug("COM8", 3);
+  bugs[4] = new Arduino_bug("COM9", 4);
+  bugs[5] = new Arduino_bug("COM10", 5);
+
+  led_arduino_port = new Serial(this, "COM7", 9600);
+  led_arduino_port.bufferUntil('\n');
 
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].init(this);
@@ -54,9 +53,10 @@ void setup() {
 }
 
 void draw() {
+  //  println("sum_value: "+bugs[2].sum_value); // for dubugging
   background(0);
   basic_interface();
-  float total_time = 0;
+  total_time = 0;
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].update();
 
@@ -69,14 +69,17 @@ void draw() {
         float previous_height = bugs[i].energy_height;
         float energy_height_y = 0;
         for (int j=0;j<bugs.length;j++) {
-          if (bugs[j]!=null) total += energy_height_display(bugs[j].sum_value);
+          if (bugs[j]!=null && total<height/2.5) total += 100*energy_height_display(bugs[j].sum_value); // for testing ("*100")
         }
         // don't exceed the battery height
-        if (total<height/2.5) bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
+        if (total<height/2.5) {
+//          println("total : "+total);
+            bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
+        }
         else bugs[i].energy_height = previous_height;
         // energy_height_y
         for (int j = 0; j<=i; j++) {
-          if (bugs[j]!=null) energy_height_y += energy_height_display(bugs[j].sum_value);
+          if (bugs[j]!=null && total<height/2.5) energy_height_y += 100*energy_height_display(bugs[j].sum_value);
         }
         update_line_from_bug(i, bugs[i].bug_id);
 
@@ -100,7 +103,7 @@ void draw() {
   }
   total_time = light_up_time_text(total_time);
   update_timer(total_time);
-  if (total_time > 0.0000001 && knob_value <1023 && knob_value >0) light_up_bulb(knob_value); //TODO: check the knob value
+  if (total_time > 0.0000001 && knob_value <1023 && knob_value >0) light_up_bulb(knob_value);
   else light_up_bulb(1023);//turn the light off
 }
 
@@ -116,10 +119,6 @@ void serialEvent(Serial sourcePort) {
     //   println("FROM led ARDUINO: " + inString.trim()); 
     // TODO: deal with "inString", data from potencialometer
     knob_value = int(inString.trim());
-    light_up_bulb(knob_value);
-    // knob_value:1023 (OFF)   
-    //println("knob_value: "+knob_value);
-    //light_up_bulb(knob_value);
   }
 }
 

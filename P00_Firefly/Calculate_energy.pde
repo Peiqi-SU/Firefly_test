@@ -11,28 +11,19 @@ float blub_consumption(float value) {
   if (value < 0.00000005){
       return 0;
   }
-  else if (knob_value <1023 && knob_value >=800 && value > 0.00000005){
-    println("value : "+value);
-    return value -=0.00000005;
-    
+  // strong light
+  else if (knob_value < 400) {
+    return value-= 0.00000005;//0.000001;
+  }
+  // medium light
+  else if (knob_value >=400 && knob_value < 800) {
+     return value-=  0.000000001;//0.000005;
+  } 
+  // weak light
+  else if (knob_value >=800 && knob_value < 1023) {
+    return value-= 0.000000005;//0.00001;
   }
   else return value;
-//  if (knob_value<20) {
-//    return value;
-//  }
-//  // weak light
-//  else if (knob_value >=20 && knob_value < 400) {
-//    return value-=0.000001;
-//  }
-//  // medium light
-//  else if (knob_value >=400 && knob_value < 800) {
-//     return value-=0.000005;
-//  } 
-//  // strong light
-//  else if (knob_value >=800 && knob_value < 1023) {
-//    return value-=0.00001;
-//  }
-//  else return value;
 }
 // shake for 1min, sum_value = 3.89 *10^-5 J
 // shake for 5min, energy max = 0.0001J
@@ -45,6 +36,7 @@ float energy_height_display(float sum_value) {
   return height_value;
 }
 
-float light_up_time_text(int bug_energy) {
+float light_up_time_text(float bug_energy) {
   return (float)bug_energy/0.004;
 }
+
