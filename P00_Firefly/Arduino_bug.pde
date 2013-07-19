@@ -103,7 +103,7 @@ class Arduino_bug
   }
 
   void init_transfer() {
-    if (!fake)port.write(0x07);//bell signal, means '/a'
+    if(!DEBUG) port.write(0x07);//bell signal, means '/a'
   }
 
   void handle_valid_data() {
