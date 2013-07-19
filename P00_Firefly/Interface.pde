@@ -34,7 +34,7 @@ void update_bugs(int i, float value, int id, String name) {
   if (id>-1) text(name, x-width/30, y-height/25);
   // Time
   textSize(BIG);
-  if (value>-1) text(value, x-width/25, y+height/100); //for testing --chan (value '*100')
+  if (value>-1) text(value*100, x-width/25, y+height/100); //for testing --chan (value '*100')
 }
 
 void update_battery(int i, float energy_height, float energy_height_y, int id, String name) {
@@ -60,18 +60,25 @@ void update_battery(int i, float energy_height, float energy_height_y, int id, S
   }
 }
 
-void update_line_from_bug(int i, int id) {
+void update_line_from_bug(int i, int id, int bug_value) {
   int x = int((width/8)*(i+1.5));
   int y = height-height/7;
   int line_color = 0;
-  if (id == 1 || id == 2) line_color = #0A0AFF;//stroke(10, 10, 255); 
-  else if (id == 3 || id == 4) line_color = #FF0A0A;//stroke(255, 10, 10);
-  else if (id == 5 || id == 6) line_color= #0AFF0A;//stroke(10, 255, 10);
-  stroke(line_color);
-  strokeWeight(10);
-  //  rect(width/2, height/2.3, width/6, height/2.5, width/100);
-  // (x-start,y-start,x-end,y-end,dash-style,color,animate?)
-  draw_dashline(x, y, width/2, height/2.3+height/5, dashes_bug, line_color, true);
+  if (bug_value >0) {
+    if (id == 1 || id == 2) line_color = #0A0AFF;//stroke(10, 10, 255); 
+    else if (id == 3 || id == 4) line_color = #FF0A0A;//stroke(255, 10, 10);
+    else if (id == 5 || id == 6) line_color= #0AFF0A;//stroke(10, 255, 10);
+    stroke(line_color);
+    strokeWeight(10);
+    //  rect(width/2, height/2.3, width/6, height/2.5, width/100);
+    // (x-start,y-start,x-end,y-end,dash-style,color,animate?)
+    draw_dashline(x, y, width/2, height/2.3+height/5, dashes_bug, line_color, true);
+  }
+  else {
+   stroke(#CCCCCC);
+    strokeWeight(4);
+    draw_dashline(x, y, width/2, height/2.3+height/5, dashes_bug, #CCCCCC, false);
+  }
 }
 
 void update_line_from_battery(boolean animate) {
