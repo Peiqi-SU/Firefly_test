@@ -10,18 +10,14 @@ class Arduino_bug
   int pages_limit=2;
   int receive_counter=pages_limit;
   int bug_id=-1;
-  String bug_name;
   int bug_value;
   int serial_cable_position=-1;
 
   boolean has_valid_data=false;
-  float valid_data_total;// sum energy, not voltage
-  float valid_data[];
+  int valid_data_total;
+  int valid_data[];
   int valid_bug_id;
   int valid_serial_cable_position;
-
-  float sum_value = 0; // sum energy, not voltage
-  float energy_height = 0; // the height of the energy
 
   Arduino_bug(String _portname, int pos) {
     serial_cable_position=pos;
@@ -53,7 +49,7 @@ class Arduino_bug
     if (trimmed.length()>0) {
       if (trimmed.length()==16*4) {  //it's a page data
         if (receive_counter<pages_limit) {
-          //          println(trimmed); // for debuging
+          println(trimmed); // for debuging
           for (int i=0;i<16;i++) {
             if ((16*receive_counter+i)<raw_data.length) raw_data[16*receive_counter+i]=unhex(trimmed.substring(i*4, i*4+4));
           }
@@ -66,11 +62,10 @@ class Arduino_bug
       } 
       else if (trimmed.length()==4) { //it's a single value
         bug_value=unhex(trimmed);
-        handle_single_data(bug_value);
-        //        println("Got value: " + bug_value); // TODO: deal with input value
+        println("Got value: " + bug_value); // TODO: deal with input value
       } 
       else if (trimmed.length()==8) {  //it's data length
-        //        println(trimmed);
+        println(trimmed);
         int len=unhex(trimmed.substring(0, 4));
         int len_inv=unhex(trimmed.substring(4, 8));
         if (len+len_inv==0xFFFF) {  // parity
@@ -86,14 +81,7 @@ class Arduino_bug
       else if (trimmed.length()==5 && trimmed.charAt(0)=='~') {
         int id=unhex(trimmed.substring(1, 5));
         bug_id=id;
-        // assign kid's name to each bug
-        if (bug_id == 1) bug_name = blue_1;
-        if (bug_id == 2) bug_name = blue_2;
-        if (bug_id == 3) bug_name = red_1;
-        if (bug_id == 4) bug_name = red_2;
-        if (bug_id == 5) bug_name = green_1;
-        if (bug_id == 6) bug_name = green_2;
-        //        println("FROM"+id);
+        println("FROM"+id);
       }
       else {
         println("! unexpected:"+trimmed);
@@ -107,29 +95,20 @@ class Arduino_bug
   }
 
   void handle_valid_data() {
-    valid_data=new float[raw_data.length];
+    valid_data=new int[raw_data.length];
     arrayCopy(raw_data, valid_data);
     int accumulator = 0;
     for (int i = 0; i < valid_data.length; i++) {
-      if (valid_data[i]!=0) accumulator += bug_energy(valid_data[i]);
+      accumulator += valid_data[i];
     }
     valid_data_total=accumulator;
     valid_bug_id=bug_id;
-
     valid_serial_cable_position=serial_cable_position;
 
     has_valid_data=true;
 
-    // add the data to sum value
-    sum_value += valid_data_total;
-
     println("Bug "+ valid_bug_id +" on port "+valid_serial_cable_position+" has "+valid_data.length+" values with a sum of "+valid_data_total);
     //TODO: call visualization with  valid_bug_id, valid_serial_cable_position, valid_data.length, valid_data_total
-  }
-
-  void handle_single_data(int value) {
-    // add the data to sum value
-    if (value != 0) sum_value += bug_energy(value);
   }
 
   void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
