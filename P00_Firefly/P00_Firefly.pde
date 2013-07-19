@@ -6,6 +6,10 @@ Serial led_arduino_port;
 
 int knob_value = 0;
 float total_time = 0;
+boolean fake=true;
+String fake_shake_data[]= {
+  "0000\n", "0000\n", "0000\n"
+};
 
 void setup() {
   size(1024, 700);  //I can't test on FULL HD
@@ -44,12 +48,14 @@ void setup() {
   //  bugs[4] = new Arduino_bug("COM9", 4);
   //  bugs[5] = new Arduino_bug("COM10", 5);
 
-  led_arduino_port = new Serial(this, "COM7", 9600);
-  led_arduino_port.bufferUntil('\n');
+  if (fake==false) {
+    led_arduino_port = new Serial(this, "COM7", 9600);
+    led_arduino_port.bufferUntil('\n');
+  }
   // -- end of windows ---------------------------------
   //
   for (int i=0;i<bugs.length;i++)
-    if (bugs[i]!=null) bugs[i].init(this);
+    if (bugs[i]!=null & fake==false) bugs[i].init(this);
 
   //fake a bug
   //bugs[0] = new Arduino_bug("COM44", 0);
@@ -108,6 +114,19 @@ void draw() {
   update_timer(total_time);
   if (total_time > 0.0000001 && knob_value <1023 && knob_value >=0) light_up_bulb(knob_value);
   else light_up_bulb(1023);//turn the light off
+
+  //fake present of bugs
+  if (fake) {
+    if (frameCount%3==0)
+      for (int i=0;i<bugs.length;i++)
+        if (bugs[i]!=null) bugs[i].uart_receive("\n");
+    if (frameCount%10==0)
+      for (int i=0;i<bugs.length;i++)
+        if (bugs[i]!=null) {
+          bugs[i].uart_receive(fake_shake_data[i]);
+          if (!fake_shake_data[i].equals("0000\n")) fake_shake_data[i]="0000\n";
+        }
+  }
 }
 
 void serialEvent(Serial sourcePort) {
@@ -138,5 +157,20 @@ void mouseClicked() {
    bugs[0].valid_bug_id=3;
    bugs[0].valid_serial_cable_position=bugs[0].serial_cable_position;
    bugs[0].has_valid_data=true;*/
+}
+
+void keyPressed()
+{
+  switch(key) {  //change value to be sent in next frame
+  case 'r':
+    if (fake) fake_shake_data[0]="0064\n";
+    break;
+  case 'g':
+    if (fake) fake_shake_data[1]="0064\n";
+    break;
+  case 'b':
+    if (fake) fake_shake_data[2]="0064\n";
+    break;
+  }
 }
 
