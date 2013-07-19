@@ -34,7 +34,7 @@ void update_bugs(int i, float value, int id, String name) {
   if (id>-1) text(name, x-width/30, y-height/25);
   // Time
   textSize(BIG);
-  if (value>-1) text(value*100, x-width/25, y+height/100); //for testing --chan (value '*100')
+  if (value>-1) text(value, x-width/25, y+height/100); //for testing --chan (value '*100')
 }
 
 void update_battery(int i, float energy_height, float energy_height_y, int id, String name) {

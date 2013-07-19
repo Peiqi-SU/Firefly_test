@@ -106,7 +106,7 @@ void draw() {
   }
   total_time = light_up_time_text(total_time);
   update_timer(total_time);
-  if (total_time > 0.0000001 && knob_value <1023 && knob_value >0) light_up_bulb(knob_value);
+  if (total_time > 0.0000001 && knob_value <1023 && knob_value >=0) light_up_bulb(knob_value);
   else light_up_bulb(1023);//turn the light off
 }
 

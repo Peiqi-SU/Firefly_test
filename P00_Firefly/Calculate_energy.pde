@@ -7,22 +7,15 @@ float bug_energy(float v) {
 }
 
 float blub_consumption(float value) {
+  println("knob_value: " + knob_value);
   // no light
-  if (value < 0.00000005){
-      return 0;
-  }
+  if (value < 0.00000005) return 0;
   // strong light
-  else if (knob_value < 400) {
-    return value-= 0.00000005;//0.000001;
-  }
+  else if (knob_value < 400) return value-= 0.00000005;//0.000001;
   // medium light
-  else if (knob_value >=400 && knob_value < 800) {
-     return value-=  0.000000001;//0.000005;
-  } 
+  else if (knob_value >=400 && knob_value < 800) return value-=  0.000000001;//0.000005; 
   // weak light
-  else if (knob_value >=800 && knob_value < 1023) {
-    return value-= 0.000000005;//0.00001;
-  }
+  else if (knob_value >=800 && knob_value < 1023) return value-= 0.000000005;//0.00001;
   else return value;
 }
 // shake for 1min, sum_value = 3.89 *10^-5 J
