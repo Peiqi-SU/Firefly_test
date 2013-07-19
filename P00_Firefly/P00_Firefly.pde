@@ -6,8 +6,6 @@ Serial led_arduino_port;
 
 int knob_value = 0;
 float total_time = 0;
-int total_bugs = 3;
-//float pre_energy_height_y = 0;
 
 void setup() {
   size(1024, 700);  //I can't test on FULL HD
@@ -71,42 +69,26 @@ void draw() {
       if (bugs[i].present) {
         // total height
         float total = 0;
-        //        float previous_height = bugs[i].energy_height;
-        //        float energy_height_y = 0;
-        //        float previous_energy_height_y = energy_height_y;
-        // don't exceed the battery height
-        //        if ( total<height/2.5) {
+        float previous_height = bugs[i].energy_height;
+        float energy_height_y = 0;
         for (int j=0;j<bugs.length;j++) {
-          if (bugs[j]!=null) total += 100*energy_height_display(bugs[j].sum_value); // for testing ("*100")
+          if (bugs[j]!=null && total<height/2.5) total += 100*energy_height_display(bugs[j].sum_value); // for testing ("*100")
         }
-        if ( total<height/2.5) {
+        // don't exceed the battery height
+        if (total<height/2.5) {
+          //          println("total : "+total);
           bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
-
-          //          else previous_height = bugs[i].energy_height;
-
-          // energy_height_y (including self height)
-          for (int j = 0; j<i; j++) {
-            if (bugs[j]!=null) {
-              bugs[i].energy_height_y +=  bugs[j].energy_height ;
-              //              previous_energy_height_y = energy_height_y;
-            }
-            bugs[i].energy_height_y += bugs[i].energy_height;
-          }
         }
-        //        else {
-        //          bugs[i].energy_height = previous_height;
-        //          energy_height_y = previous_energy_height_y;
-        //        }
-        println("total: "+total);
-        //        // energy_height_y (including self height)
-        //        for (int j = 0; j<=i; j++) {
-        //          if (bugs[j]!=null && total < height/2.5) energy_height_y += 100*energy_height_display(bugs[j].sum_value);
-        //        }
+        else bugs[i].energy_height = previous_height;
+        // energy_height_y (including self height)
+        for (int j = 0; j<=i; j++) {
+          if (bugs[j]!=null && total < height/2.5) energy_height_y += 100*energy_height_display(bugs[j].sum_value);
+        }
         update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
 
         float this_bug_time = light_up_time_text(bugs[i].sum_value);
         update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
-        if (bugs[i].sum_value > 0)update_battery(bugs[i].serial_cable_position, bugs[i].energy_height, bugs[i].energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
+        if (bugs[i].sum_value > 0)update_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
         total_time += bugs[i].sum_value;
       } 
       // if bug is offline

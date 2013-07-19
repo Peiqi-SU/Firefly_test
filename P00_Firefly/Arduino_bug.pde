@@ -22,7 +22,6 @@ class Arduino_bug
 
   float sum_value = 0; // sum energy, not voltage
   float energy_height = 0; // the height of the energy
-   float energy_height_y = 0; // the Y-position of the height of the energy
 
   Arduino_bug(String _portname, int pos) {
     serial_cable_position=pos;
