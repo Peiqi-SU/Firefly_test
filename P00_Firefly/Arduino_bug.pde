@@ -121,7 +121,7 @@ class Arduino_bug
     has_valid_data=true;
 
     // add the data to sum value
-    sum_value += valid_data_total;
+    sum_value += valid_data_total*1000000; // for testing '*1000000'
 
     println("Bug "+ valid_bug_id +" on port "+valid_serial_cable_position+" has "+valid_data.length+" values with a sum of "+valid_data_total);
     //TODO: call visualization with  valid_bug_id, valid_serial_cable_position, valid_data.length, valid_data_total
@@ -130,6 +130,8 @@ class Arduino_bug
   void handle_single_data(int value) {
     // add the data to sum value
     if (value != 0) sum_value += bug_energy(value);
+    //println("sumvalue: "+sum_value); //for debug
+    if (sum_value > 0.00000000001) sum_value = blub_consumption(sum_value); // sum_value threshold
   }
 
   void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
@@ -148,6 +150,9 @@ class Arduino_bug
       x0=x1;
     }
     //println("~~~~");
+  }
+  public float get_sumvalue(){
+    return sum_value;
   }
 }
 
