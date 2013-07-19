@@ -17,7 +17,8 @@ void setup() {
 
   background(0);
   frameRate(30);
-  /*//mac
+  
+  //mac | uncomment this if run on Mac`---------
    String portlist[]=Serial.list();
    int index=0;
    for (int i=0;i<portlist.length;i++) {
@@ -31,20 +32,22 @@ void setup() {
    led_arduino_port = new Serial(this, portlist[i], 9600);
    led_arduino_port.bufferUntil('\n');
    }
-   }*/
+   }
+   // -- end of mac ---------------------------------
 
-
-  //windows`
-  bugs[0] = new Arduino_bug("COM13", 0);
-  bugs[1] = new Arduino_bug("COM5", 1);
-  bugs[2] = new Arduino_bug("COM6", 2);
-  bugs[3] = new Arduino_bug("COM8", 3);
-  bugs[4] = new Arduino_bug("COM9", 4);
-  bugs[5] = new Arduino_bug("COM10", 5);
-
-  led_arduino_port = new Serial(this, "COM7", 9600);
-  led_arduino_port.bufferUntil('\n');
-
+  /*
+  //windows | uncomment this if run on Windows`---------
+   bugs[0] = new Arduino_bug("COM13", 0);
+   bugs[1] = new Arduino_bug("COM5", 1);
+   bugs[2] = new Arduino_bug("COM6", 2);
+   bugs[3] = new Arduino_bug("COM8", 3);
+   bugs[4] = new Arduino_bug("COM9", 4);
+   bugs[5] = new Arduino_bug("COM10", 5);
+   
+   led_arduino_port = new Serial(this, "COM7", 9600);
+   led_arduino_port.bufferUntil('\n');
+   // -- end of windows ---------------------------------
+   */
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].init(this);
 
@@ -73,8 +76,8 @@ void draw() {
         }
         // don't exceed the battery height
         if (total<height/2.5) {
-//          println("total : "+total);
-            bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
+          //          println("total : "+total);
+          bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
         }
         else bugs[i].energy_height = previous_height;
         // energy_height_y
