@@ -57,6 +57,14 @@ void setup() {
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null & fake==false) bugs[i].init(this);
 
+
+  if (fake) {
+    for (int i=0;i<bugs.length;i++) {
+      if (bugs[i]!=null) {
+        bugs[i].uart_receive("~000"+(i*2+1)+"\n");
+      }
+    }
+  }
   //fake a bug
   //bugs[0] = new Arduino_bug("COM44", 0);
 }
@@ -163,13 +171,13 @@ void keyPressed()
 {
   switch(key) {  //change value to be sent in next frame
   case 'r':
-    if (fake) fake_shake_data[0]="0064\n";
+    if (fake) fake_shake_data[0]="0014\n";
     break;
   case 'g':
-    if (fake) fake_shake_data[1]="0064\n";
+    if (fake) fake_shake_data[1]="0014\n";
     break;
   case 'b':
-    if (fake) fake_shake_data[2]="0064\n";
+    if (fake) fake_shake_data[2]="0014\n";
     break;
   }
 }
