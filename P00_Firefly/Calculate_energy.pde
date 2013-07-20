@@ -1,4 +1,4 @@
-/*// Energy in Capacitor: E = 1/2*C*V^2 = 1/2*100uF*3.3^2 = 0.54*10^-3J
+// Energy in Capacitor: E = 1/2*C*V^2 = 1/2*100uF*3.3^2 = 0.54*10^-3J
 // power of LED: P = 2V * 2mA = 4*10^-3W
 // Time = E/P
 float bug_energy(float v) {
@@ -11,7 +11,8 @@ float blub_consumption(float value) {
   // no light
   if (value < 0.00000005) return 0;
   // strong light
-  else if (knob_value < 400) return value-= 0.00000005;//0.000001;
+  else if (knob_value < 50) return value-=  0.0000001;
+  else if (knob_value >=50 && knob_value < 400) return value-= 0.00000005;//0.000001;
   // medium light
   else if (knob_value >=400 && knob_value < 800) return value-=  0.000000001;//0.000005; 
   // weak light

@@ -1,7 +1,6 @@
-/*int bulb_change_interval = 50; // change the bulb's color every 50ms
+int bulb_change_interval = 50; // change the bulb's color every 50ms
 int last_change_time = -bulb_change_interval; 
 
-//TODO : error handle when the knob value =0 (the light turns off)
 void light_up_bulb(int value) {
   int current_time = millis();
   if (current_time - last_change_time < bulb_change_interval) {
@@ -14,12 +13,14 @@ void light_up_bulb(int value) {
     String g = nf(gi,3);
     String b = nf(bi,3);
 //    println("r: " + r + " --g: "+g+" --b: "+b); // for debugging
-    led_arduino_port.write(r);
-    led_arduino_port.write(",");
-    led_arduino_port.write(g);
-    led_arduino_port.write(",");
-    led_arduino_port.write(b);
-    led_arduino_port.write("\n");
+    if (!DEBUG) {
+      led_arduino_port.write(r);
+      led_arduino_port.write(",");
+      led_arduino_port.write(g);
+      led_arduino_port.write(",");
+      led_arduino_port.write(b);
+      led_arduino_port.write("\n");
+    }
     last_change_time = millis();
   } 
 }
