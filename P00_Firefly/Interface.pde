@@ -1,4 +1,4 @@
-final int SMALL = 18; //small size of font
+/*final int SMALL = 18; //small size of font
 final int BIG = 30; //BIG size of font
 final int HUGE = 80; //huge size of font
 

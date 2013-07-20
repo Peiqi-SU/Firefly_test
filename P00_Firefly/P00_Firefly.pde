@@ -1,11 +1,18 @@
+/*
+ * ========================================================
+ * Including fake code for testing software without Arduino
+ * ========================================================
+ */
+/*
 import processing.serial.*;
 
-Arduino_bug bugs[]=new Arduino_bug[6]; // init num of bugs
+Arduino_bug bugs[]=new Arduino_bug[3]; // init num of bugs
 
 Serial led_arduino_port;
 
 int knob_value = 0;
 float total_time = 0;
+int total_bugs = 3;
 
 void setup() {
   size(1024, 768);  //I can't test on FULL HD
@@ -17,8 +24,7 @@ void setup() {
 
   background(0);
   frameRate(30);
-  
-  //mac | uncomment this if run on Mac`---------
+   //mac | uncomment this if run on Mac`---------
    String portlist[]=Serial.list();
    int index=0;
    for (int i=0;i<portlist.length;i++) {
@@ -34,9 +40,9 @@ void setup() {
    }
    }
    // -- end of mac ---------------------------------
-
-  /*
-  //windows | uncomment this if run on Windows`---------
+   
+   
+   //windows | uncomment this if run on Windows`---------
    bugs[0] = new Arduino_bug("COM13", 0);
    bugs[1] = new Arduino_bug("COM5", 1);
    bugs[2] = new Arduino_bug("COM6", 2);
@@ -47,9 +53,10 @@ void setup() {
    led_arduino_port = new Serial(this, "COM7", 9600);
    led_arduino_port.bufferUntil('\n');
    // -- end of windows ---------------------------------
-   */
-  for (int i=0;i<bugs.length;i++)
-    if (bugs[i]!=null) bugs[i].init(this);
+   
+   
+   for (int i=0;i<bugs.length;i++)
+   if (bugs[i]!=null) bugs[i].init(this);
 
   //fake a bug
   //bugs[0] = new Arduino_bug("COM44", 0);
@@ -101,7 +108,7 @@ void draw() {
 
   for (int i=0;i<bugs.length;i++) {
     if (bugs[i]!=null &&  bugs[i].has_valid_data) { //you can also add present condition
-      bugs[i].draw_graph(0, 0, 100, 100);
+      //      bugs[i].draw_graph(0, 0, 100, 100);
     }
   }
   total_time = light_up_time_text(total_time);
@@ -124,19 +131,4 @@ void serialEvent(Serial sourcePort) {
     knob_value = int(inString.trim());
   }
 }
-
-void mouseClicked() {
-  //if (bugs[0]!=null) println(bugs[0].raw_data); // for debugging
-  //fake some data;
-  /*bugs[0].valid_data=new int[120];
-   int accumulator = 0;
-   for (int i = 0; i < bugs[0].valid_data.length; i++) {
-   bugs[0].valid_data[i]=int(2.5+2.5*sin(i*TWO_PI/20));
-   accumulator += bugs[0].valid_data[i];
-   }
-   bugs[0].valid_data_total=accumulator;
-   bugs[0].valid_bug_id=3;
-   bugs[0].valid_serial_cable_position=bugs[0].serial_cable_position;
-   bugs[0].has_valid_data=true;*/
-}
-
+*/

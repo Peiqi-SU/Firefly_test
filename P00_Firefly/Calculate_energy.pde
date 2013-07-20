@@ -1,4 +1,4 @@
-// Energy in Capacitor: E = 1/2*C*V^2 = 1/2*100uF*3.3^2 = 0.54*10^-3J
+/*// Energy in Capacitor: E = 1/2*C*V^2 = 1/2*100uF*3.3^2 = 0.54*10^-3J
 // power of LED: P = 2V * 2mA = 4*10^-3W
 // Time = E/P
 float bug_energy(float v) {

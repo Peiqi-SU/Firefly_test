@@ -1,4 +1,4 @@
-class Arduino_bug 
+/*class Arduino_bug 
 {
   String portname="";
   Serial port;
@@ -103,7 +103,7 @@ class Arduino_bug
   }
 
   void init_transfer() {
-    port.write(0x07);//bell signal, means '/a'
+//    port.write(0x07);//bell signal, means '/a'
   }
 
   void handle_valid_data() {

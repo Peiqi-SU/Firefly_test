@@ -1,4 +1,4 @@
-// Copy each block and write down the time
+/*// Copy each block and write down the time
 // time: 
 String blue_1 = "Peiqi";
 String blue_2 = "Bob";

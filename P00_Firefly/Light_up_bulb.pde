@@ -1,4 +1,4 @@
-int bulb_change_interval = 50; // change the bulb's color every 50ms
+/*int bulb_change_interval = 50; // change the bulb's color every 50ms
 int last_change_time = -bulb_change_interval; 
 
 //TODO : error handle when the knob value =0 (the light turns off)
