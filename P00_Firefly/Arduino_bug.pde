@@ -55,7 +55,7 @@ class Arduino_bug
     if (trimmed.length()>0) {
       if (trimmed.length()==16*4) {  //it's a page data
         if (receive_counter<pages_limit) {
-          println("a page received"); // for debuging
+//          println("a page received"); // for debuging
           for (int i=0;i<16;i++) {
             if ((16*receive_counter+i)<raw_data.length) raw_data[16*receive_counter+i]=unhex(trimmed.substring(i*4, i*4+4));
           }
@@ -71,11 +71,11 @@ class Arduino_bug
         handle_single_data(bug_value);
         // for debugging
       
-          println("trimmed.length()==4 with value: " + bug_value); // TODO: deal with input value
+//          println("trimmed.length()==4 with value: " + bug_value); // TODO: deal with input value
         
       }
       else if (trimmed.length()==8) {  //it's data length
-        println("trimmed.length()==8 with value: "+trimmed);
+//        println("trimmed.length()==8 with value: "+trimmed);
         int len=unhex(trimmed.substring(0, 4));
         int len_inv=unhex(trimmed.substring(4, 8));
         if (len+len_inv==0xFFFF) {  // parity
@@ -89,7 +89,7 @@ class Arduino_bug
         }
       }
       else if (trimmed.length()==5 && trimmed.charAt(0)=='~') {
-        println("trimmed.length()==5");
+//        println("trimmed.length()==5");
         int id=unhex(trimmed.substring(1, 5));
         bug_id=id;
         // assign kid's name to each bug
@@ -137,7 +137,11 @@ class Arduino_bug
     // add the data to sum value
     if (value != 0) sum_value += bug_energy(value);
     //println("sumvalue: "+sum_value); //for debug
+<<<<<<< HEAD
+    if (sum_value > 0.00000000001) sum_value = blub_consumption(sum_value, bug_id); // sum_value threshold
+=======
     if (sum_value > 0.00000000001) sum_value = blub_consumption(sum_value,knob_value); // sum_value threshold
+>>>>>>> 77e8fcda1c63ff23b311d9519415e785406aa3f4
   }
 
   void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
@@ -161,7 +165,11 @@ class Arduino_bug
     return sum_value;
   }
   public void set_knob_value(int value){
+<<<<<<< HEAD
+//    knob_value = value;
+=======
     knob_value = value;
+>>>>>>> 77e8fcda1c63ff23b311d9519415e785406aa3f4
   }  
 }
 

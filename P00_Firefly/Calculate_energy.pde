@@ -6,19 +6,37 @@ float bug_energy(float v) {
   return 5*sq(v)*pow(10, -5);
 }
 
+<<<<<<< HEAD
+float blub_consumption(float value, int id) {
+  println(id);
+  float this_knob_value = 0;
+  if (id==1 || id==2) {
+    this_knob_value = b_knob;
+  }
+  if (id==3 || id==4) {
+    this_knob_value = r_knob;
+  }
+  if (id==5 || id==6) {
+    this_knob_value = g_knob;
+  }
+
+  println("this_knob_value: "+this_knob_value);
+=======
 float blub_consumption(float value, float knob_value) {
 //  println("knob_value: " + knob_value);
+>>>>>>> 77e8fcda1c63ff23b311d9519415e785406aa3f4
   // no light
   if (value <= 0) return 0;
   // strong light
-  else if (knob_value < 50) return value-=  0.0000001;
-  else if (knob_value >=50 && knob_value < 400) return value-= 0.00000005;//0.000001;
+  else if (this_knob_value < 50) return value-=  0.0000001;
+  else if (this_knob_value >=50 && this_knob_value < 400) return value-= 0.00000005;//0.000001;
   // medium light
-  else if (knob_value >=400 && knob_value < 800) return value-=  0.000000001;//0.000005; 
+  else if (this_knob_value >=400 && this_knob_value < 800) return value-=  0.000000001;//0.000005; 
   // weak light
-  else if (knob_value >=800 && knob_value < 1023) return value-= 0.000000005;//0.00001;
+  else if (this_knob_value >=800 && this_knob_value < 1023) return value-= 0.000000005;//0.00001;
   else return value;
 }
+
 // shake for 1min, sum_value = 3.89 *10^-5 J
 // shake for 5min, energy max = 0.0001J
 float energy_max = 0.0001; //J

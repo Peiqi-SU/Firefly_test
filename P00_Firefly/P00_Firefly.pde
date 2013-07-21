@@ -6,22 +6,22 @@
  *
  * BUG:
  * FIXED - Sketch crashs caused by "error, disabling serialEvent() for //./COM?
-   >>exception: serialEvent exception: java.lang.ArrayStoreException
-   >>situation: replug a bug after a long time 
-   so the super capacitor will drain too much power from serial port.
+ >>exception: serialEvent exception: java.lang.ArrayStoreException
+ >>situation: replug a bug after a long time 
+ so the super capacitor will drain too much power from serial port.
  * FIXED - Line auto blinking. 
-   >>situation: When bug keeps connecting for a while, 
-   sometimes the line from bug to battery will auto blink each 2s. 
+ >>situation: When bug keeps connecting for a while, 
+ sometimes the line from bug to battery will auto blink each 2s. 
  * Switch bug error.
-   >>situation: Once the bug is reconnected to a different port, system will crush.
+ >>situation: Once the bug is reconnected to a different port, system will crush.
  * Data length error.
-   >> situation: unknown. rarely happened. 
-   1 time on #5 with usb hub and long cable
+ >> situation: unknown. rarely happened. 
+ 1 time on #5 with usb hub and long cable
  */
 import processing.serial.*;
 
 boolean DEBUG=true;
-boolean disable_led=true;
+boolean disable_led=false;
 String fake_shake_data[]= {
   "0000\n", "0000\n", "0000\n"
 };
@@ -31,10 +31,11 @@ Interface rui, gui, bui;
 Serial led_arduino_port;
 
 int speed_rate = 100; // gain energy bar speed rate
-//int knob_value = 1023; // 0=max light; 1023=turn off the light
-int r_knob = 1000;
-int g_knob = 0;
-int b_knob = 300;
+int[] knob_value = new int[3]; // 0=max light; 1023=turn off the light
+int[] knob_value_out = new int[3];
+int r_knob = 255;
+int g_knob = 255;
+int b_knob = 255;
 
 float total_time = 0;
 float r_total_time = 0;
@@ -76,19 +77,19 @@ void setup() {
   /*/
 
   //windows | uncomment this if run on Windows`---------
-  if(DEBUG){
-      bugs[0] = new Arduino_bug("COM5", 0);
-      bugs[1] = new Arduino_bug("COM10", 1);
-      bugs[2] = new Arduino_bug("COM13", 2);
+  if (DEBUG) {
+    bugs[0] = new Arduino_bug("COM5", 0);
+    bugs[1] = new Arduino_bug("COM10", 1);
+    bugs[2] = new Arduino_bug("COM13", 2);
   }
-  else{
-      bugs[0] = new Arduino_bug("COM11", 0);
-      bugs[0].port = new Serial(this, "COM11", 115200);
-      bugs[0].port.bufferUntil('\n');
+  else {
+    bugs[0] = new Arduino_bug("COM11", 0);
+    bugs[0].port = new Serial(this, "COM11", 115200);
+    bugs[0].port.bufferUntil('\n');
   }
-//  bugs[1] = new Arduino_bug("COM10", 0);
-//  bugs[1].port = new Serial(this, "COM10", 115200);
-//  bugs[1].port.bufferUntil('\n');
+  //  bugs[1] = new Arduino_bug("COM10", 0);
+  //  bugs[1].port = new Serial(this, "COM10", 115200);
+  //  bugs[1].port.bufferUntil('\n');
 
   //  bugs[1] = new Arduino_bug("COM10", 1);
   //  bugs[2] = new Arduino_bug("COM13", 2);
@@ -96,12 +97,12 @@ void setup() {
   //  bugs[4] = new Arduino_bug("COM9", 4);
   //  bugs[5] = new Arduino_bug("COM10", 5);
 
-  if (!DEBUG) {
-    if (!disable_led) {
-      led_arduino_port = new Serial(this, "COM7", 9600);
-      led_arduino_port.bufferUntil('\n');
-    }
+
+  if (!disable_led) {
+    led_arduino_port = new Serial(this, "COM7", 115200);
+    led_arduino_port.bufferUntil('\n');
   }
+
   // -- end of windows ---------------------------------
 
   //  for (int i=0;i<bugs.length;i++)
@@ -126,97 +127,100 @@ void draw() {
   bui.set_battery_cx(3*width/4 + x_offset);
 
   // line from battery to bulb
-  rui.draw_powerline(r_knob,r_total_time);
-  gui.draw_powerline(g_knob,g_total_time);
-  bui.draw_powerline(b_knob,b_total_time);
-  
+  rui.draw_powerline(r_knob, r_total_time);
+  gui.draw_powerline(g_knob, g_total_time);
+  bui.draw_powerline(b_knob, b_total_time);
   // battery ui 
   rui.draw_battery_border();
   gui.draw_battery_border();
   bui.draw_battery_border();
 
-  
   total_time = 0;
   r_total_time = 0;
   g_total_time = 0;
   b_total_time = 0;
-  
+
   for (int i=0;i<bugs.length;i++)
     if (bugs[i]!=null) bugs[i].update();
 
   for (int i=0;i<bugs.length;i++) {
     if (bugs[i]!=null) {
-        if(bugs[i].bug_id == 1 || bugs[i].bug_id == 2){        // blue bug
-          if (bugs[i].present) {
-            float total = 0;
-            float previous_height = bugs[i].energy_height;
-            float energy_height_y = 0;
-            total += speed_rate*energy_height_display(bugs[i].sum_value); 
-            bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
-            
-            float this_bug_time = light_up_time_text(bugs[i].sum_value);
-            bui.update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
-            bui.update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
-            if (bugs[i].sum_value > 0) bui.update_grid_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
-            total_time += bugs[i].sum_value;
-            b_total_time += bugs[i].sum_value;
-          } 
-          // if bug is offline
-          else {
-            bui.update_bugs( i, -1, -1, "");
-            bui.update_battery(i, -1, -1, -1, "");
-          }
-          bugs[i].set_knob_value(b_knob);
-          if (bugs[i].sum_value > 
-          0001 && b_knob <1023 && b_knob >=0) light_up_bulb(b_knob);
-          else light_up_bulb(1023);//turn the light off          
-        }
-        else if(bugs[i].bug_id == 3 || bugs[i].bug_id == 4){        // red bug
-          if (bugs[i].present) {
-            float total = 0;
-            float previous_height = bugs[i].energy_height;
-            float energy_height_y = 0;
-            total += speed_rate*energy_height_display(bugs[i].sum_value); 
-            bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
-            float this_bug_time = light_up_time_text(bugs[i].sum_value);
-            rui.update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
-            rui.update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
-            if (bugs[i].sum_value > 0) rui.update_grid_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
-            total_time += bugs[i].sum_value;
-            r_total_time += bugs[i].sum_value;
-          } 
-          // if bug is offline
-          else {
-            rui.update_bugs( i, -1, -1, "");
-            rui.update_battery(i, -1, -1, -1, "");
-          }
-          bugs[i].set_knob_value(r_knob);
-          if (bugs[i].sum_value > 0.0000001 && r_knob <1023 && r_knob >=0) light_up_bulb(r_knob);
-          else light_up_bulb(1023);//turn the light off
+      if (bugs[i].bug_id == 1 || bugs[i].bug_id == 2) {        // blue bug
+        if (bugs[i].present) {
+          float total = 0;
+          float previous_height = bugs[i].energy_height;
+          float energy_height_y = 0;
+          total += speed_rate*energy_height_display(bugs[i].sum_value); 
+          bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
+
+          float this_bug_time = light_up_time_text(bugs[i].sum_value);
+          bui.update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
+          bui.update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
+          if (bugs[i].sum_value > 0) bui.update_grid_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
+          total_time += bugs[i].sum_value;
+          b_total_time += bugs[i].sum_value;
         } 
-        else if(bugs[i].bug_id == 5 || bugs[i].bug_id == 6){        // green bug
-          if (bugs[i].present) {
-            float total = 0;
-            float previous_height = bugs[i].energy_height;
-            float energy_height_y = 0;
-            total += speed_rate*energy_height_display(bugs[i].sum_value); 
-            bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
-            float this_bug_time = light_up_time_text(bugs[i].sum_value);
-            gui.update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
-            gui.update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
-            if (bugs[i].sum_value > 0) gui.update_grid_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
-            total_time += bugs[i].sum_value;
-            g_total_time += bugs[i].sum_value;
-          } 
-          // if bug is offline
-          else {
-            gui.update_bugs( i, -1, -1, "");
-            gui.update_battery(i, -1, -1, -1, "");
-          }
-          bugs[i].set_knob_value(g_knob);
-          if (bugs[i].sum_value > 0.0000001 && g_knob <1023 && g_knob >=0) light_up_bulb(g_knob);
-          else light_up_bulb(1023);//turn the light off
+        // if bug is offline
+        else {
+          bui.update_bugs( i, -1, -1, "");
+          bui.update_battery(i, -1, -1, -1, "");
         }
+        bugs[i].set_knob_value(b_knob);
+        //        if (bugs[i].sum_value > 0.0000001 && b_knob <1023 && b_knob >=0) light_up_bulb(r_knob, g_knob, b_knob);
+        //        else light_up_bulb(r_knob, g_knob, 1023);//turn the light off
+        if (bugs[i].sum_value > 0.0000001) knob_value_out[2] = b_knob;
+        else knob_value_out[2] = 1023;
+      }
+      else if (bugs[i].bug_id == 3 || bugs[i].bug_id == 4) {        // red bug
+        if (bugs[i].present) {
+          float total = 0;
+          float previous_height = bugs[i].energy_height;
+          float energy_height_y = 0;
+          total += speed_rate*energy_height_display(bugs[i].sum_value); 
+          bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
+          float this_bug_time = light_up_time_text(bugs[i].sum_value);
+          rui.update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
+          rui.update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
+          if (bugs[i].sum_value > 0) rui.update_grid_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
+          total_time += bugs[i].sum_value;
+          r_total_time += bugs[i].sum_value;
+        } 
+        // if bug is offline
+        else {
+          rui.update_bugs( i, -1, -1, "");
+          rui.update_battery(i, -1, -1, -1, "");
+        }
+        bugs[i].set_knob_value(r_knob);
+        //        if (bugs[i].sum_value > 0.0000001 && r_knob <1023 && r_knob >=0) light_up_bulb(r_knob, g_knob, b_knob);
+        //        else light_up_bulb(1023, g_knob, b_knob );//turn the light off
+        if (bugs[i].sum_value > 0.0000001) knob_value_out[0] = r_knob;
+        else knob_value_out[0] = 1023;
+      } 
+      else if (bugs[i].bug_id == 5 || bugs[i].bug_id == 6) {        // green bug
+        if (bugs[i].present) {
+          float total = 0;
+          float previous_height = bugs[i].energy_height;
+          float energy_height_y = 0;
+          total += speed_rate*energy_height_display(bugs[i].sum_value); 
+          bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
+          float this_bug_time = light_up_time_text(bugs[i].sum_value);
+          gui.update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
+          gui.update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
+          if (bugs[i].sum_value > 0) gui.update_grid_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
+          total_time += bugs[i].sum_value;
+          g_total_time += bugs[i].sum_value;
+        } 
+        // if bug is offline
+        else {
+          gui.update_bugs( i, -1, -1, "");
+          gui.update_battery(i, -1, -1, -1, "");
+        }
+        bugs[i].set_knob_value(g_knob);
+        //        if (bugs[i].sum_value > 0.0000001 && g_knob <1023 && g_knob >=0) light_up_bulb(r_knob, g_knob, b_knob);
+        //        else light_up_bulb(r_knob, 1023, b_knob);//turn the light off
+        if (bugs[i].sum_value > 0.0000001) knob_value_out[1] = g_knob;
+        else knob_value_out[1] = 1023;
+      }
     }
   }
 
@@ -259,11 +263,16 @@ void draw() {
    }
    }
    */
+   // draw graph
   for (int i=0;i<bugs.length;i++) {
     if (bugs[i]!=null &&  bugs[i].has_valid_data) { //you can also add present condition
       bugs[i].draw_graph(0, 0, 100, 100);
     }
   }
+  
+  // sent data to light up bulb
+  send_light_up_bulb();
+
   //total_time = speed_rate*light_up_time_text(total_time); // for debugging '*100'
   //rui.update_timer(total_time);
 
@@ -293,13 +302,19 @@ void serialEvent(Serial sourcePort) {
     if (sourcePort==led_arduino_port) { 
       //   println("FROM led ARDUINO: " + inString.trim()); 
       // TODO: deal with "inString", data from potencialometer
-      r_knob = int(inString.trim());
-      g_knob = int(inString.trim());
-      b_knob = int(inString.trim());
+      String temp = inString.trim();
+      int knob_value_array[] = int(split(temp, ','));
+      r_knob = int(map(knob_value_array[0], 50, 1000, 0, 1023));
+      g_knob = int(map(knob_value_array[1], 50, 1000, 0, 1023));
+      b_knob = int(map(knob_value_array[2], 50, 1000, 0, 1023));
+      r_knob = constrain(r_knob, 0, 1023);
+      g_knob = constrain(g_knob, 0, 1023);
+      b_knob = constrain(b_knob, 0, 1023);
+      //      println("r_knob: "+r_knob+" --- g_knob: "+g_knob+" --- b_knob: "+b_knob);
     }
   }
-  catch(Exception e){
-  println("serialEvent exception: " + e);
+  catch(Exception e) {
+    println("serialEvent exception: " + e);
   }
 }
 void mouseClicked() {
@@ -329,22 +344,22 @@ void keyPressed()
     if (DEBUG) fake_shake_data[0]="0014\n";
     break;
   case 'e' :
-    if (DEBUG) r_knob += 50;
+    if (disable_led) r_knob += 50;
     break;
   case 't' : 
-    if (DEBUG) r_knob -= 50;
+    if (disable_led) r_knob -= 50;
     break;
   case 'f' :
-    if (DEBUG) g_knob += 50;
+    if (disable_led) g_knob += 50;
     break;
   case 'h' : 
-    if (DEBUG) g_knob -= 50;
+    if (disable_led) g_knob -= 50;
     break;
   case 'v' :
-    if (DEBUG) b_knob += 50;
+    if (disable_led) b_knob += 50;
     break;
   case 'n' : 
-    if (DEBUG) b_knob -= 50;
+    if (disable_led) b_knob -= 50;
     break;
   }
 }
