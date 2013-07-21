@@ -21,7 +21,7 @@
 import processing.serial.*;
 
 boolean DEBUG=true;
-boolean disable_led=false;
+boolean DISABLE_LED=true;
 String fake_shake_data[]= {
   "0000\n", "0000\n", "0000\n"
 };
@@ -83,22 +83,19 @@ void setup() {
     bugs[2] = new Arduino_bug("COM13", 2);
   }
   else {
-    bugs[0] = new Arduino_bug("COM11", 0);
-    bugs[0].port = new Serial(this, "COM11", 115200);
+    bugs[0] = new Arduino_bug("COM5", 0);
+    bugs[0].port = new Serial(this, "COM5", 115200);
     bugs[0].port.bufferUntil('\n');
+    bugs[1] = new Arduino_bug("COM10", 0);
+    bugs[1].port = new Serial(this, "COM10", 115200);
+    bugs[1].port.bufferUntil('\n');
+    bugs[2] = new Arduino_bug("COM13", 0);
+    bugs[2].port = new Serial(this, "COM13", 115200);
+    bugs[2].port.bufferUntil('\n');
   }
-  //  bugs[1] = new Arduino_bug("COM10", 0);
-  //  bugs[1].port = new Serial(this, "COM10", 115200);
-  //  bugs[1].port.bufferUntil('\n');
+  
 
-  //  bugs[1] = new Arduino_bug("COM10", 1);
-  //  bugs[2] = new Arduino_bug("COM13", 2);
-  //  bugs[3] = new Arduino_bug("COM8", 3);
-  //  bugs[4] = new Arduino_bug("COM9", 4);
-  //  bugs[5] = new Arduino_bug("COM10", 5);
-
-
-  if (!disable_led) {
+  if (!DISABLE_LED) {
     led_arduino_port = new Serial(this, "COM7", 115200);
     led_arduino_port.bufferUntil('\n');
   }
@@ -344,22 +341,22 @@ void keyPressed()
     if (DEBUG) fake_shake_data[0]="0014\n";
     break;
   case 'e' :
-    if (disable_led) r_knob += 50;
+    if (DISABLE_LED) r_knob += 50;
     break;
   case 't' : 
-    if (disable_led) r_knob -= 50;
+    if (DISABLE_LED) r_knob -= 50;
     break;
   case 'f' :
-    if (disable_led) g_knob += 50;
+    if (DISABLE_LED) g_knob += 50;
     break;
   case 'h' : 
-    if (disable_led) g_knob -= 50;
+    if (DISABLE_LED) g_knob -= 50;
     break;
   case 'v' :
-    if (disable_led) b_knob += 50;
+    if (DISABLE_LED) b_knob += 50;
     break;
   case 'n' : 
-    if (disable_led) b_knob -= 50;
+    if (DISABLE_LED) b_knob -= 50;
     break;
   }
 }

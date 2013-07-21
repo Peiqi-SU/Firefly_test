@@ -6,9 +6,9 @@ float bug_energy(float v) {
   return 5*sq(v)*pow(10, -5);
 }
 
-<<<<<<< HEAD
+
 float blub_consumption(float value, int id) {
-  println(id);
+//  println(id);
   float this_knob_value = 0;
   if (id==1 || id==2) {
     this_knob_value = b_knob;
@@ -20,11 +20,7 @@ float blub_consumption(float value, int id) {
     this_knob_value = g_knob;
   }
 
-  println("this_knob_value: "+this_knob_value);
-=======
-float blub_consumption(float value, float knob_value) {
-//  println("knob_value: " + knob_value);
->>>>>>> 77e8fcda1c63ff23b311d9519415e785406aa3f4
+//  println("this_knob_value: "+this_knob_value);
   // no light
   if (value <= 0) return 0;
   // strong light
