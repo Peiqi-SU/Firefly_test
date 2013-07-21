@@ -13,6 +13,8 @@ class Arduino_bug
   String bug_name;
   int bug_value;
   int serial_cable_position=-1;
+  int knob_value;
+
 
   boolean has_valid_data=false;
   float valid_data_total;// sum energy, not voltage
@@ -135,7 +137,7 @@ class Arduino_bug
     // add the data to sum value
     if (value != 0) sum_value += bug_energy(value);
     //println("sumvalue: "+sum_value); //for debug
-    if (sum_value > 0.00000000001) sum_value = blub_consumption(sum_value); // sum_value threshold
+    if (sum_value > 0.00000000001) sum_value = blub_consumption(sum_value,knob_value); // sum_value threshold
   }
 
   void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
@@ -158,5 +160,8 @@ class Arduino_bug
   public float get_sumvalue() {
     return sum_value;
   }
+  public void set_knob_value(int value){
+    knob_value = value;
+  }  
 }
 
