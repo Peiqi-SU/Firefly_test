@@ -6,10 +6,10 @@ float bug_energy(float v) {
   return 5*sq(v)*pow(10, -5);
 }
 
-float blub_consumption(float value) {
+float blub_consumption(float value, float knob_value) {
 //  println("knob_value: " + knob_value);
   // no light
-  if (value < 0.00000005) return 0;
+  if (value <= 0) return 0;
   // strong light
   else if (knob_value < 50) return value-=  0.0000001;
   else if (knob_value >=50 && knob_value < 400) return value-= 0.00000005;//0.000001;

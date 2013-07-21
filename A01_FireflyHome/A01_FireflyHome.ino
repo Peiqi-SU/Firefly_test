@@ -1,13 +1,12 @@
 unsigned long previousMillis = 0; 
-String inputString = "";         // a string to hold incoming data
-String dealString = "";         // a string to hold incoming data
+String inputString = "";         
+String dealString = "";        
 
 boolean stringComplete = false;  // whether the string is complete
 
 
 void setup() {
-  // initialize serial communications at 9600 bps:
-  Serial.begin(9600); 
+  Serial.begin(115200); 
   inputString.reserve(64);
   dealString.reserve(64);
   pinMode(9,OUTPUT);
@@ -16,12 +15,16 @@ void setup() {
 }
 
 void loop() {
-  // read the analog in value:
-
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillis > 50) { // send value to processing every 50ms
-    unsigned int sensorValue = analogRead(0);            
-    Serial.println(sensorValue);      
+    unsigned int sensorValueR = analogRead(0);  
+    unsigned int sensorValueG= analogRead(1);
+    unsigned int sensorValueB = analogRead(2);
+    Serial.print(sensorValueR);    
+    Serial.print(",");    
+    Serial.print(sensorValueG);  
+    Serial.print(",");      
+    Serial.println(sensorValueB);      
     previousMillis=currentMillis;
   }
   if (stringComplete) {
@@ -31,21 +34,27 @@ void loop() {
     dealString.trim();
     unsigned char r,g,b;
     unsigned char comma_index=dealString.indexOf(',');
-    if (comma_index>0){
-      r=dealString.substring(0,comma_index).toInt();
-      unsigned char comma_index2=dealString.indexOf(',',comma_index+1);
-      if (comma_index2>0){
-        g=dealString.substring(comma_index+1,comma_index2).toInt();
-        b=dealString.substring(comma_index2+1,dealString.length()).toInt();
-        analogWrite(9,b); //b
-        analogWrite(10,r);  //r
-        analogWrite(11,g); // g
-      }
-      /* for debugging
-       Serial.println(r);
-       Serial.println(g);
-       Serial.println(b);*/
-    }
+    r=dealString.substring(0,3).toInt();
+    g=dealString.substring(4,7).toInt();
+    b=dealString.substring(8,11).toInt();
+    analogWrite(9,r); //b
+        analogWrite(10,g);  //r
+        analogWrite(11,b); // g
+//    if (comma_index>0){
+//      r=dealString.substring(0,comma_index).toInt();
+//      unsigned char comma_index2=dealString.indexOf(',',comma_index+1);
+//      if (comma_index2>0){
+//        g=dealString.substring(comma_index+1,comma_index2).toInt();
+//        b=dealString.substring(comma_index2+1,dealString.length()).toInt();
+//        analogWrite(9,r); //b
+//        analogWrite(10,g);  //r
+//        analogWrite(11,b); // g
+//      }
+//      /* for debugging
+//       Serial.println(r);
+//       Serial.println(g);
+//       Serial.println(b);*/
+//    }
   }
 }
 
@@ -62,6 +71,8 @@ void serialEvent() {
     } 
   }
 }
+
+
 
 
 
