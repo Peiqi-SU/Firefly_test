@@ -7,7 +7,7 @@
 //#define DATA_MAX_LEN 65536  //MAX of EEPROM
 #define DATA_MAX_LEN 1024
 
-#define UNIQUE_ID 3
+#define UNIQUE_ID 1
 
 
 // Change to 6 to disable the green LED
@@ -26,7 +26,7 @@ boolean last_loop_plugged = false;
 unsigned char send_value_interval_counter = 0;
 
 void setup() {                
-  Serial.begin(115200);
+  Serial.begin(9600);
   Wire.begin();
   // initialize the digital pin as an output.
   pinMode(led, OUTPUT);  
@@ -59,7 +59,7 @@ void loop() {
       while (Serial.read() != -1);  //clear serial buffer (read until -1)
     }
     send_value_interval_counter++;
-    if (send_value_interval_counter==5){  // only affect the coonecting mode
+    if (send_value_interval_counter==3){  // only affect the coonecting mode
       send_one_int_value(analogRead(0));  //send a value every n*100 ms
       send_value_interval_counter=0;
     }
@@ -108,7 +108,7 @@ void loop() {
     }
     last_loop_plugged = false;
     //LowPower.powerDown(SLEEP_120MS, ADC_OFF, BOD_OFF); //debugging
-    LowPower.powerDown(SLEEP_2S, ADC_OFF, BOD_OFF); 
+    LowPower.powerDown(SLEEP_1S, ADC_OFF, BOD_OFF); 
   }
 
   //LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);  

@@ -1,12 +1,8 @@
 final int SMALL = 18; //small size of font
 final int BIG = 30; //BIG size of font
 final int HUGE = 80; //huge size of font
-float [ ] dashes_bug = {
-  5, 15
-};
-float [ ] dashes_battery = {
-  10, 30
-};
+float [ ] dashes_bug = {5, 15};
+float [ ] dashes_battery = {10, 30};
 
 class Interface {
   int battery_life = 0;
@@ -48,9 +44,9 @@ class Interface {
   }
   public void update_bugs(int i, float value, int id, String name) {
     noStroke();
-    if (id == 1 || id == 2) fill(10, 10, 255);
-    else if (id == 3 || id == 4) fill(255, 10, 10);
-    else if (id == 5 || id == 6) fill(10, 255, 10);
+    if (id == 3 || id == 6) fill(10, 10, 255);
+    else if (id == 1 || id == 4) fill(255, 10, 10);
+    else if (id == 2 || id == 5) fill(10, 255, 10);
     else if (id == -1) fill(100, 100, 100);
     else println("wrong bug ID in - [update_bugs]:"+id);
 
@@ -62,7 +58,9 @@ class Interface {
     if (id>-1) text(name, bug_cx-width/30, bug_cy-height/25);
     // Time
     textSize(BIG);
-    if (value>-1) text(value*speed_rate, bug_cx-width/25, bug_cy+height/100);
+    // prevent Minus value
+    if (value>0) text(nfc(value*speed_rate,3)+" s", bug_cx-width/25, bug_cy+height/100);
+    else if (value <=0) text(nfc(0.000,3)+" s", bug_cx-width/25, bug_cy+height/100);
   }
 
   public void update_battery(int i, float energy_height, float energy_height_y, int id, String name) {
@@ -70,9 +68,9 @@ class Interface {
       energy_height = energy_height*speed_rate; 
       float strokeoffset = 4;
 
-      if (id == 1 || id == 2) fill(10, 10, 255);
-      else if (id == 3 || id == 4) fill(255, 10, 10);
-      else if (id == 5 || id == 6) fill(10, 255, 10);
+      if (id == 3 || id == 6) fill(10, 10, 255);
+      else if (id == 1 || id == 4) fill(255, 10, 10);
+      else if (id == 2 || id == 5) fill(10, 255, 10);
       else if (id == -1) noFill();
       else println("wrong bug ID in - [update_bugs]:"+id);
       stroke(187);
@@ -87,6 +85,55 @@ class Interface {
       text(name, x, y-strokeoffset+SMALL);
     }
   }
+    
+  public void update_grid_battery(int i, float energy_height, float energy_height_y, int id, String name) {
+    if (id>-1) {
+      // determin unit size
+      int unit_block_num = 20; // per line
+      float unit_h = 20;       
+
+      energy_height = energy_height*speed_rate; 
+      float strokeoffset = 4;
+      float unit_w = (battery_w-strokeoffset*2)/unit_block_num;
+      int line_num = 1;
+      int remained_block = 0;
+      int max_line = int(battery_h/unit_h);
+      
+      if (id == 3 || id == 6) fill(10, 10, 255);
+      else if (id == 1 || id == 4) fill(255, 10, 10);
+      else if (id == 2 || id == 5) fill(10, 255, 10);
+      else if (id == -1) noFill();
+      else println("wrong bug ID in - [update_bugs]:"+id);
+      stroke(187);
+      strokeWeight(0);
+      rectMode(CORNER);
+             
+      float x = battery_cx - battery_w/2 +strokeoffset;
+      float y = battery_cy + battery_h/2 - line_num*unit_h -strokeoffset;  
+      line_num = int(energy_height / unit_block_num);
+      remained_block = int(energy_height % unit_block_num);
+      
+      //prevent max-out
+      if (line_num >= max_line){ 
+        println("max out : "+line_num+","+max_line);
+        line_num = max_line;
+        remained_block = 0;
+      }
+      
+      for(int l=0;l<line_num;l++){
+        for(int k=0;k<unit_block_num;k++){
+          rect(x+unit_w*k,y-l*unit_h,unit_w,unit_h);
+        }
+      }
+      for(int j=0;j<remained_block;j++){
+        rect(x+unit_w*j, y-line_num*unit_h, unit_w, unit_h);
+      }
+       
+      fill(255);
+      textSize(SMALL);
+      text(name, x, y-strokeoffset+SMALL);
+    }
+  }
 
   public void update_line_from_bug(int i, int id, int bug_value) {
     int x = int(battery_cx);
@@ -94,9 +141,9 @@ class Interface {
     int line_color = 0;
     boolean animate = false;
     if (bug_value >3) { // bug_balue could be 0,1,2 when bug is not shaked
-      if (id == 1 || id == 2) line_color = #0A0AFF;//stroke(10, 10, 255); 
-      else if (id == 3 || id == 4) line_color = #FF0A0A;//stroke(255, 10, 10);
-      else if (id == 5 || id == 6) line_color= #0AFF0A;//stroke(10, 255, 10);
+      if (id == 3 || id == 6) line_color = #0A0AFF;//stroke(10, 10, 255); 
+      else if (id == 1 || id == 4) line_color = #FF0A0A;//stroke(255, 10, 10);
+      else if (id == 2 || id == 5) line_color= #0AFF0A;//stroke(10, 255, 10);
       animate = true;
     }
     else {

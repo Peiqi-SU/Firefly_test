@@ -4,7 +4,7 @@ class Arduino_bug
   Serial port;
   int valid_heartbeat_interval=400;
   int last_hearbeat_time = -valid_heartbeat_interval;
-  int baudrate=115200;
+  int baudrate=9600;
   boolean present=false;
   int raw_data[]=new int[32*2];
   int pages_limit=2;
@@ -13,6 +13,8 @@ class Arduino_bug
   String bug_name;
   int bug_value;
   int serial_cable_position=-1;
+  int knob_value;
+
 
   boolean has_valid_data=false;
   float valid_data_total;// sum energy, not voltage
@@ -53,7 +55,7 @@ class Arduino_bug
     if (trimmed.length()>0) {
       if (trimmed.length()==16*4) {  //it's a page data
         if (receive_counter<pages_limit) {
-          println("a page received"); // for debuging
+          println("a page received: " + trimmed.length()); // for debuging
           for (int i=0;i<16;i++) {
             if ((16*receive_counter+i)<raw_data.length) raw_data[16*receive_counter+i]=unhex(trimmed.substring(i*4, i*4+4));
           }
@@ -91,12 +93,12 @@ class Arduino_bug
         int id=unhex(trimmed.substring(1, 5));
         bug_id=id;
         // assign kid's name to each bug
-        if (bug_id == 1) bug_name = blue_1;
-        if (bug_id == 2) bug_name = blue_2;
-        if (bug_id == 3) bug_name = red_1;
+        if (bug_id == 1) bug_name = red_1;
+        if (bug_id == 2) bug_name = green_1;
+        if (bug_id == 3) bug_name = blue_1;
         if (bug_id == 4) bug_name = red_2;
-        if (bug_id == 5) bug_name = green_1;
-        if (bug_id == 6) bug_name = green_2;
+        if (bug_id == 5) bug_name = green_2;
+        if (bug_id == 6) bug_name = blue_2;
         //        println("FROM"+id);
       }
       else {
@@ -135,7 +137,7 @@ class Arduino_bug
     // add the data to sum value
     if (value != 0) sum_value += bug_energy(value);
     //println("sumvalue: "+sum_value); //for debug
-    if (sum_value > 0.00000000001) sum_value = blub_consumption(sum_value); // sum_value threshold
+    if (sum_value > 0.00000000001) sum_value = blub_consumption(sum_value, bug_id); // sum_value threshold
   }
 
   void draw_graph(float pos_x, float pos_y, float graph_width, float graph_height) {
@@ -158,5 +160,9 @@ class Arduino_bug
   public float get_sumvalue() {
     return sum_value;
   }
+  public void set_knob_value(int value){
+
+//    knob_value = value;
+  }  
 }
 

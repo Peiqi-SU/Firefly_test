@@ -6,7 +6,7 @@ boolean stringComplete = false;  // whether the string is complete
 
 
 void setup() {
-  Serial.begin(115200); 
+  Serial.begin(9600); 
   inputString.reserve(64);
   dealString.reserve(64);
   pinMode(9,OUTPUT);
