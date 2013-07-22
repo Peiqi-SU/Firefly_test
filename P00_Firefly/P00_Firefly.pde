@@ -12,7 +12,7 @@
  * FIXED - Line auto blinking. 
  >>situation: When bug keeps connecting for a while, 
  sometimes the line from bug to battery will auto blink each 2s. 
- * Switch bug error.
+ * FIXED - Switch bug error.
  >>situation: Once the bug is reconnected to a different port, system will crush.
  * Data length error.
  >> situation: unknown. rarely happened. 
@@ -331,6 +331,14 @@ void mouseClicked() {
 void keyPressed()
 {
   switch(key) {  //change value to be sent in next frame
+  case 's':
+  for(int i=0;i<bugs.length;i++){
+    if (bugs[i].table != null) {
+//      TODO: save .csv name with yyyy-mm-dd-hh-mm-ss--bug_id_bug_name
+      saveTable(bugs[i].table, "data/bug"+ bugs[i].bug_id + bugs[i].bug_name +".csv");
+    }
+  }
+    break;
   case 'r':
     if (DEBUG) fake_shake_data[1]="0028\n";
     break;
