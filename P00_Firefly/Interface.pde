@@ -44,9 +44,9 @@ class Interface {
   }
   public void update_bugs(int i, float value, int id, String name) {
     noStroke();
-    if (id == 1 || id == 2) fill(10, 10, 255);
-    else if (id == 3 || id == 4) fill(255, 10, 10);
-    else if (id == 5 || id == 6) fill(10, 255, 10);
+    if (id == 3 || id == 6) fill(10, 10, 255);
+    else if (id == 1 || id == 4) fill(255, 10, 10);
+    else if (id == 2 || id == 5) fill(10, 255, 10);
     else if (id == -1) fill(100, 100, 100);
     else println("wrong bug ID in - [update_bugs]:"+id);
 
@@ -59,8 +59,11 @@ class Interface {
     // Time
     textSize(BIG);
     // prevent Minus value
-    if (value>0) text(nfc(value*speed_rate,3)+" s", bug_cx-width/25, bug_cy+height/100);
-    else if (value <=0) text(nfc(0.000,3)+" s", bug_cx-width/25, bug_cy+height/100);
+//    if (value>0) text(nfc(value*speed_rate,3)+" s", bug_cx-width/25, bug_cy+height/100);
+//    else if (value <=0) text(nfc(0.000,3)+" s", bug_cx-width/25, bug_cy+height/100);
+    float temp = value*speed_rate*1000;
+    if (value>0) text(nfc(temp,2)+" s", bug_cx-width/25, bug_cy+height/100);
+    else if (value <=0) text(nfc(0.00,2)+" s", bug_cx-width/25, bug_cy+height/100);
   }
 
   public void update_battery(int i, float energy_height, float energy_height_y, int id, String name) {
@@ -68,9 +71,9 @@ class Interface {
       energy_height = energy_height*speed_rate; 
       float strokeoffset = 4;
 
-      if (id == 1 || id == 2) fill(10, 10, 255);
-      else if (id == 3 || id == 4) fill(255, 10, 10);
-      else if (id == 5 || id == 6) fill(10, 255, 10);
+      if (id == 3 || id == 6) fill(10, 10, 255);
+      else if (id == 1 || id == 4) fill(255, 10, 10);
+      else if (id == 2 || id == 5) fill(10, 255, 10);
       else if (id == -1) noFill();
       else println("wrong bug ID in - [update_bugs]:"+id);
       stroke(187);
@@ -99,9 +102,9 @@ class Interface {
       int remained_block = 0;
       int max_line = int(battery_h/unit_h);
       
-      if (id == 1 || id == 2) fill(10, 10, 255);
-      else if (id == 3 || id == 4) fill(255, 10, 10);
-      else if (id == 5 || id == 6) fill(10, 255, 10);
+      if (id == 3 || id == 6) fill(10, 10, 255);
+      else if (id == 1 || id == 4) fill(255, 10, 10);
+      else if (id == 2 || id == 5) fill(10, 255, 10);
       else if (id == -1) noFill();
       else println("wrong bug ID in - [update_bugs]:"+id);
       stroke(187);
@@ -141,9 +144,9 @@ class Interface {
     int line_color = 0;
     boolean animate = false;
     if (bug_value >3) { // bug_balue could be 0,1,2 when bug is not shaked
-      if (id == 1 || id == 2) line_color = #0A0AFF;//stroke(10, 10, 255); 
-      else if (id == 3 || id == 4) line_color = #FF0A0A;//stroke(255, 10, 10);
-      else if (id == 5 || id == 6) line_color= #0AFF0A;//stroke(10, 255, 10);
+      if (id == 3 || id == 6) line_color = #0A0AFF;//stroke(10, 10, 255); 
+      else if (id == 1 || id == 4) line_color = #FF0A0A;//stroke(255, 10, 10);
+      else if (id == 2 || id == 5) line_color= #0AFF0A;//stroke(10, 255, 10);
       animate = true;
     }
     else {

@@ -21,7 +21,7 @@
 import processing.serial.*;
 
 boolean DEBUG=true;
-boolean DISABLE_LED=true;
+boolean DISABLE_LED=false;
 String fake_shake_data[]= {
   "0000\n", "0000\n", "0000\n"
 };
@@ -30,12 +30,12 @@ Arduino_bug bugs[]; // init num of bugs
 Interface rui, gui, bui;
 Serial led_arduino_port;
 
-int speed_rate = 100; // gain energy bar speed rate
+int speed_rate = 1; // gain energy bar speed rate
 int[] knob_value = new int[3]; // 0=max light; 1023=turn off the light
 int[] knob_value_out = new int[3];
-int r_knob = 255;
-int g_knob = 255;
-int b_knob = 255;
+int r_knob = 1023;
+int g_knob = 1023;
+int b_knob = 1023;
 
 float total_time = 0;
 float r_total_time = 0;
@@ -58,7 +58,8 @@ void setup() {
   rui = new Interface();
   gui = new Interface();
   bui = new Interface();
-  /*/mac | uncomment this if run on Mac`---------
+  /*/mac | uncomment th
+  is if run on Mac`---------
    String portlist[]=Serial.list();
    int index=0;
    for (int i=0;i<portlist.length;i++) {
@@ -83,20 +84,20 @@ void setup() {
     bugs[2] = new Arduino_bug("COM13", 2);
   }
   else {
-    bugs[0] = new Arduino_bug("COM5", 0);
-    bugs[0].port = new Serial(this, "COM5", 115200);
+    bugs[0] = new Arduino_bug("COM4", 0);
+    bugs[0].port = new Serial(this, "COM4", 9600);
     bugs[0].port.bufferUntil('\n');
-    bugs[1] = new Arduino_bug("COM10", 0);
-    bugs[1].port = new Serial(this, "COM10", 115200);
+    bugs[1] = new Arduino_bug("COM9", 0);
+    bugs[1].port = new Serial(this, "COM9", 9600);
     bugs[1].port.bufferUntil('\n');
     bugs[2] = new Arduino_bug("COM13", 0);
-    bugs[2].port = new Serial(this, "COM13", 115200);
+    bugs[2].port = new Serial(this, "COM13", 9600);
     bugs[2].port.bufferUntil('\n');
   }
   
 
   if (!DISABLE_LED) {
-    led_arduino_port = new Serial(this, "COM7", 115200);
+    led_arduino_port = new Serial(this, "COM7", 9600);
     led_arduino_port.bufferUntil('\n');
   }
 
@@ -142,7 +143,7 @@ void draw() {
 
   for (int i=0;i<bugs.length;i++) {
     if (bugs[i]!=null) {
-      if (bugs[i].bug_id == 1 || bugs[i].bug_id == 2) {        // blue bug
+      if (bugs[i].bug_id == 3 || bugs[i].bug_id == 6) {        // blue bug
         if (bugs[i].present) {
           float total = 0;
           float previous_height = bugs[i].energy_height;
@@ -168,7 +169,7 @@ void draw() {
         if (bugs[i].sum_value > 0.0000001) knob_value_out[2] = b_knob;
         else knob_value_out[2] = 1023;
       }
-      else if (bugs[i].bug_id == 3 || bugs[i].bug_id == 4) {        // red bug
+      else if (bugs[i].bug_id == 1 || bugs[i].bug_id == 4) {        // red bug
         if (bugs[i].present) {
           float total = 0;
           float previous_height = bugs[i].energy_height;
@@ -193,7 +194,7 @@ void draw() {
         if (bugs[i].sum_value > 0.0000001) knob_value_out[0] = r_knob;
         else knob_value_out[0] = 1023;
       } 
-      else if (bugs[i].bug_id == 5 || bugs[i].bug_id == 6) {        // green bug
+      else if (bugs[i].bug_id == 2 || bugs[i].bug_id == 5) {        // green bug
         if (bugs[i].present) {
           float total = 0;
           float previous_height = bugs[i].energy_height;
@@ -289,7 +290,7 @@ void draw() {
 
 void serialEvent(Serial sourcePort) {
   try {
-    String inString = sourcePort.readStringUntil('\n');
+    String inString = sourcePort.readString();
     int i; 
     for (i=0;i<bugs.length;i++)
       if (bugs[i]!=null && bugs[i].port==sourcePort) break;
