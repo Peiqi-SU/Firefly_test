@@ -16,8 +16,9 @@ void setup() {
 
 void loop() {
   unsigned long currentMillis = millis();
+  unsigned int sensorValueR;
   if(currentMillis - previousMillis > 50) { // send value to processing every 50ms
-    unsigned int sensorValueR = analogRead(0);  
+    sensorValueR = analogRead(0);  
     unsigned int sensorValueG= analogRead(1);
     unsigned int sensorValueB = analogRead(2);
     Serial.print(sensorValueR);    
@@ -37,7 +38,7 @@ void loop() {
     r=dealString.substring(0,3).toInt();
     g=dealString.substring(4,7).toInt();
     b=dealString.substring(8,11).toInt();
-    analogWrite(9,r); //b
+    analogWrite(9,sensorValueR/4); //b
         analogWrite(10,g);  //r
         analogWrite(11,b); // g
 //    if (comma_index>0){

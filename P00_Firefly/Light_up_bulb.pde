@@ -31,9 +31,12 @@
  */
 
 void send_light_up_bulb() {
-  int rii = int(knob_value_out[0]/4);
-  int gii = int(knob_value_out[1]/4);
-  int bii = int(knob_value_out[2]/4);
+  int rii = 255;
+  int gii = 255;
+  int bii = 255;
+  if (!bugs[0].first_plug && bugs[0].plugged)  rii = int(knob_value_out[0]/4);
+  if (!bugs[1].first_plug && bugs[1].plugged) gii = int(knob_value_out[1]/4);
+  if (!bugs[2].first_plug && bugs[2].plugged) bii = int(knob_value_out[2]/4);
   // println("rii: " + rii + " --gii: "+gii+" --bii: "+bii); // for debugging
   String r = nf(rii, 3);
   String g = nf(gii, 3);

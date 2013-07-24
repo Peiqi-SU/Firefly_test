@@ -15,6 +15,7 @@ class Interface {
   float bug_cy = 0;
   float bug_w = 0;
   float bug_h = 0;
+  float battery_time=0;
 
   Interface() {
     battery_cy = height/2.3;
@@ -44,9 +45,10 @@ class Interface {
   }
   public void update_bugs(int i, float value, int id, String name) {
     noStroke();
-    if (id == 3 || id == 6) fill(10, 10, 255);
-    else if (id == 1 || id == 4) fill(255, 10, 10);
-    else if (id == 2 || id == 5) fill(10, 255, 10);
+    
+    if (id == 3 || id == 6) {fill(10, 10, 255);}
+    else if (id == 1 || id == 4) {fill(255, 10, 10); }
+    else if (id == 2 || id == 5) {fill(10, 255, 10); }
     else if (id == -1) fill(100, 100, 100);
     else println("wrong bug ID in - [update_bugs]:"+id);
 
@@ -61,9 +63,9 @@ class Interface {
     // prevent Minus value
 //    if (value>0) text(nfc(value*speed_rate,3)+" s", bug_cx-width/25, bug_cy+height/100);
 //    else if (value <=0) text(nfc(0.000,3)+" s", bug_cx-width/25, bug_cy+height/100);
-    float temp = value*speed_rate*1000;
-    if (value>0) text(nfc(temp,2)+" s", bug_cx-width/25, bug_cy+height/100);
-    else if (value <=0) text(nfc(0.00,2)+" s", bug_cx-width/25, bug_cy+height/100);
+    if (value>0) battery_time = value*speed_rate*1000;
+    else battery_time = 0.000;
+    text(nfc(battery_time,2)+" s", bug_cx-width/25, bug_cy+height/100);
   }
 
   public void update_battery(int i, float energy_height, float energy_height_y, int id, String name) {
@@ -94,7 +96,6 @@ class Interface {
       // determin unit size
       int unit_block_num = 20; // per line
       float unit_h = 20;       
-
       energy_height = energy_height*speed_rate; 
       float strokeoffset = 4;
       float unit_w = (battery_w-strokeoffset*2)/unit_block_num;
@@ -102,9 +103,9 @@ class Interface {
       int remained_block = 0;
       int max_line = int(battery_h/unit_h);
       
-      if (id == 3 || id == 6) fill(10, 10, 255);
-      else if (id == 1 || id == 4) fill(255, 10, 10);
-      else if (id == 2 || id == 5) fill(10, 255, 10);
+      if (id == 3 || id == 6) {fill(10, 10, 255);}//b
+      else if (id == 1 || id == 4) {fill(255, 10, 10);}  //r
+      else if (id == 2 || id == 5) {fill(10, 255, 10);}//g
       else if (id == -1) noFill();
       else println("wrong bug ID in - [update_bugs]:"+id);
       stroke(187);
@@ -118,7 +119,7 @@ class Interface {
       
       //prevent max-out
       if (line_num >= max_line){ 
-        println("max out : "+line_num+","+max_line);
+//        println("max out : "+line_num+","+max_line);
         line_num = max_line;
         remained_block = 0;
       }
@@ -134,7 +135,7 @@ class Interface {
        
       fill(255);
       textSize(SMALL);
-      text(name, x, y-strokeoffset+SMALL);
+      text(nfc(battery_time,2), x+remained_block*unit_w, y-line_num*unit_h-strokeoffset+SMALL);
     }
   }
 

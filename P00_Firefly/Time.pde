@@ -1,6 +1,9 @@
 import java.sql.Timestamp;
 import java.util.Date;
+import java.text.SimpleDateFormat;
 
-java.util.Date date = new java.util.Date();
-Timestamp time = new Timesstamp(date.getTime());
-String current_time = time.toString();
+String get_current_time(){
+      java.util.Date date = new java.util.Date();
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss.SSS") ;
+      return dateFormat.format(date);
+}

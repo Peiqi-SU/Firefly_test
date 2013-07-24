@@ -1,4 +1,4 @@
-
+// MAX SECOND = 187s
 /* TODO:
  * Clean draw();
  * Update the border-color of each battery to R/G/B
@@ -21,7 +21,7 @@
 import processing.serial.*;
 
 boolean DEBUG=true;
-boolean DISABLE_LED=false;
+boolean DISABLE_LED=true;
 String fake_shake_data[]= {
   "0000\n", "0000\n", "0000\n"
 };
@@ -30,7 +30,13 @@ Arduino_bug bugs[]; // init num of bugs
 Interface rui, gui, bui;
 Serial led_arduino_port;
 
-int speed_rate = 1; // gain energy bar speed rate
+//OFFSET
+float speed_rate = 10; // gain energy bar speed rate
+int r_offset = 1;     // red bug rate control, compared to others
+int g_offset = 1;     // green bug rate control, compared to others
+int b_offset = 1;     // blue bug rate control, compared to others
+
+
 int[] knob_value = new int[3]; // 0=max light; 1023=turn off the light
 int[] knob_value_out = new int[3];
 int r_knob = 1023;
@@ -41,17 +47,19 @@ float total_time = 0;
 float r_total_time = 0;
 float g_total_time = 0;
 float b_total_time = 0;
-
+float max_second = 187;
+float max_sum_value = (187*0.004)/(speed_rate*1000);
 int total_bugs = 3;
 int x_offset = 110;
 
 void setup() {
   // for debugging
-  //size(800, 600);
+//  size(1920, 1080);
+//  frame.setLocation(1920, 0);
   // set fullscreen mode
-  size(displayWidth, displayHeight);
-  frame.setLocation(0, 0);
-
+//  size(displayWidth, displayHeight);
+  size(1000,800);
+  frame.setLocation(0,0);
   background(0);
   frameRate(30);
   bugs = new Arduino_bug[total_bugs];
@@ -59,7 +67,7 @@ void setup() {
   gui = new Interface();
   bui = new Interface();
   /*/mac | uncomment th
-  is if run on Mac`---------
+   is if run on Mac`---------
    String portlist[]=Serial.list();
    int index=0;
    for (int i=0;i<portlist.length;i++) {
@@ -79,22 +87,22 @@ void setup() {
 
   //windows | uncomment this if run on Windows`---------
   if (DEBUG) {
-    bugs[0] = new Arduino_bug("COM5", 0);
-    bugs[1] = new Arduino_bug("COM10", 1);
-    bugs[2] = new Arduino_bug("COM13", 2);
+    bugs[0] = new Arduino_bug("COM9", 0);
+    bugs[1] = new Arduino_bug("COM13", 1);
+    bugs[2] = new Arduino_bug("COM4", 2);
   }
   else {
-    bugs[0] = new Arduino_bug("COM4", 0);
-    bugs[0].port = new Serial(this, "COM4", 9600);
+    bugs[0] = new Arduino_bug("COM10", 0);//r
+    bugs[0].port = new Serial(this, "COM10", 9600);
     bugs[0].port.bufferUntil('\n');
-    bugs[1] = new Arduino_bug("COM9", 0);
-    bugs[1].port = new Serial(this, "COM9", 9600);
+    bugs[1] = new Arduino_bug("COM8", 0);//g
+    bugs[1].port = new Serial(this, "COM8", 9600);
     bugs[1].port.bufferUntil('\n');
-    bugs[2] = new Arduino_bug("COM13", 0);
-    bugs[2].port = new Serial(this, "COM13", 9600);
+    bugs[2] = new Arduino_bug("COM4", 0);//b
+    bugs[2].port = new Serial(this, "COM4", 9600);
     bugs[2].port.bufferUntil('\n');
   }
-  
+
 
   if (!DISABLE_LED) {
     led_arduino_port = new Serial(this, "COM7", 9600);
@@ -145,6 +153,7 @@ void draw() {
     if (bugs[i]!=null) {
       if (bugs[i].bug_id == 3 || bugs[i].bug_id == 6) {        // blue bug
         if (bugs[i].present) {
+          bugs[i].plugged =true;
           float total = 0;
           float previous_height = bugs[i].energy_height;
           float energy_height_y = 0;
@@ -152,6 +161,7 @@ void draw() {
           bugs[i].energy_height = energy_height_display(bugs[i].sum_value);
 
           float this_bug_time = light_up_time_text(bugs[i].sum_value);
+          
           bui.update_line_from_bug(i, bugs[i].bug_id, bugs[i].bug_value);
           bui.update_bugs(bugs[i].serial_cable_position, this_bug_time, bugs[i].bug_id, bugs[i].bug_name);
           if (bugs[i].sum_value > 0) bui.update_grid_battery(bugs[i].serial_cable_position, bugs[i].energy_height, energy_height_y, bugs[i].bug_id, bugs[i].bug_name);
@@ -160,8 +170,9 @@ void draw() {
         } 
         // if bug is offline
         else {
+          bugs[i].plugged =false;
           bui.update_bugs( i, -1, -1, "");
-          bui.update_battery(i, -1, -1, -1, "");
+          bui.update_grid_battery(i, -1, -1, -1, "");
         }
         bugs[i].set_knob_value(b_knob);
         //        if (bugs[i].sum_value > 0.0000001 && b_knob <1023 && b_knob >=0) light_up_bulb(r_knob, g_knob, b_knob);
@@ -171,6 +182,7 @@ void draw() {
       }
       else if (bugs[i].bug_id == 1 || bugs[i].bug_id == 4) {        // red bug
         if (bugs[i].present) {
+          bugs[i].plugged =true;
           float total = 0;
           float previous_height = bugs[i].energy_height;
           float energy_height_y = 0;
@@ -185,8 +197,9 @@ void draw() {
         } 
         // if bug is offline
         else {
+          bugs[i].plugged =false;
           rui.update_bugs( i, -1, -1, "");
-          rui.update_battery(i, -1, -1, -1, "");
+          rui.update_grid_battery(i, -1, -1, -1, "");
         }
         bugs[i].set_knob_value(r_knob);
         //        if (bugs[i].sum_value > 0.0000001 && r_knob <1023 && r_knob >=0) light_up_bulb(r_knob, g_knob, b_knob);
@@ -196,6 +209,7 @@ void draw() {
       } 
       else if (bugs[i].bug_id == 2 || bugs[i].bug_id == 5) {        // green bug
         if (bugs[i].present) {
+          bugs[i].plugged =true;
           float total = 0;
           float previous_height = bugs[i].energy_height;
           float energy_height_y = 0;
@@ -210,8 +224,9 @@ void draw() {
         } 
         // if bug is offline
         else {
+          bugs[i].plugged =false;
           gui.update_bugs( i, -1, -1, "");
-          gui.update_battery(i, -1, -1, -1, "");
+          gui.update_grid_battery(i, -1, -1, -1, "");
         }
         bugs[i].set_knob_value(g_knob);
         //        if (bugs[i].sum_value > 0.0000001 && g_knob <1023 && g_knob >=0) light_up_bulb(r_knob, g_knob, b_knob);
@@ -261,19 +276,17 @@ void draw() {
    }
    }
    */
-   // draw graph
-  for (int i=0;i<bugs.length;i++) {
-    if (bugs[i]!=null &&  bugs[i].has_valid_data) { //you can also add present condition
-      bugs[i].draw_graph(0, 0, 100, 100);
-    }
-  }
-  
+  // draw graph
+//  for (int i=0;i<bugs.length;i++) {
+//    if (bugs[i]!=null &&  bugs[i].has_valid_data) { //you can also add present condition
+//      bugs[i].draw_graph(0, 0, 100, 100);
+//    }
+//  }
   // sent data to light up bulb
   send_light_up_bulb();
 
   //total_time = speed_rate*light_up_time_text(total_time); // for debugging '*100'
   //rui.update_timer(total_time);
-
   //fake present of bugs
   if (DEBUG) {
     if (frameCount%3==0)
@@ -333,21 +346,22 @@ void keyPressed()
 {
   switch(key) {  //change value to be sent in next frame
   case 's':
-  for(int i=0;i<bugs.length;i++){
-    if (bugs[i].table != null) {
-//      TODO: save .csv name with yyyy-mm-dd-hh-mm-ss--bug_id_bug_name
-      saveTable(bugs[i].table, "data/bug"+ bugs[i].bug_id + bugs[i].bug_name +".csv");
+    for (int i=0;i<bugs.length;i++) {
+      if (bugs[i].table != null && bugs[i].bug_id != -1) {
+        //      TODO: save .csv name with yyyy-mm-dd-hh-mm-ss--bug_id_bug_name
+        println(get_current_time());
+        saveTable(bugs[i].table, "data/bug"+bugs[i].bug_id + bugs[i].bug_name +".csv");
+      }
     }
-  }
     break;
   case 'r':
-    if (DEBUG) fake_shake_data[1]="0028\n";
+    if (DEBUG) fake_shake_data[0]="0128\n";
     break;
   case 'g':
-    if (DEBUG) fake_shake_data[2]="0028\n";
+    if (DEBUG) fake_shake_data[2]="0158\n";
     break;
   case 'b':
-    if (DEBUG) fake_shake_data[0]="0014\n";
+    if (DEBUG) fake_shake_data[1]="0114\n";
     break;
   case 'e' :
     if (DISABLE_LED) r_knob += 50;
@@ -369,3 +383,4 @@ void keyPressed()
     break;
   }
 }
+
